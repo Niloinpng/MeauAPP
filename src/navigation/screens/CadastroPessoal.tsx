@@ -1,15 +1,11 @@
 import { Text } from '@react-navigation/elements';
-import { StaticScreenProps } from '@react-navigation/native';
 import { StyleSheet, View } from 'react-native';
 
-type Props = StaticScreenProps<{
-  user: string;
-}>;
 
-export function Profile({ route }: Props) {
+export function CadastroPessoal() {
   return (
     <View style={styles.container}>
-      <Text>{route.params.user}'s Profile</Text>
+      <Text>Cadastro de Pessoal</Text>
     </View>
   );
 }

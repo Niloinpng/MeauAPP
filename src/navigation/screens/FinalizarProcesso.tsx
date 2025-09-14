@@ -1,10 +1,11 @@
 import { Text } from '@react-navigation/elements';
 import { StyleSheet, View } from 'react-native';
 
-export function Updates() {
+
+export function FinalizarProcesso() {
   return (
     <View style={styles.container}>
-      <Text>Updates Screen</Text>
+      <Text>Finalizar Processo</Text>
     </View>
   );
 }
