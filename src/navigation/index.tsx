@@ -21,9 +21,33 @@ const RootStack = createNativeStackNavigator({
     },
     Adotar: {
       screen: Adotar,
+      options: {
+        title: 'Adotar', 
+        headerStyle: {
+          backgroundColor: '#ffd358', 
+        },
+        headerTitleStyle: {
+          fontFamily: 'Roboto-Medium', 
+          fontSize: 20,
+          color: '#434343',         
+        },
+        headerTintColor: '#434343', 
+      },
     },
     CadastroAnimal: {
       screen: CadastroAnimal,
+      options: {
+        title: 'Cadastrar do Animal', 
+        headerStyle: {
+          backgroundColor: '#88c9bf', 
+        },
+        headerTitleStyle: {
+          fontFamily: 'Roboto-Medium', 
+          fontSize: 20,
+          color: '#434343',         
+        },
+        headerTintColor: '#434343', 
+      },
     },
     CadastroPessoal: {
       screen: CadastroPessoal,

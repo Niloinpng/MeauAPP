@@ -35,6 +35,8 @@ It includes the following:
 
   ```sh
   npm start
+
+  npx expo start
   ```
 
 - Build and run iOS and Android development builds:
