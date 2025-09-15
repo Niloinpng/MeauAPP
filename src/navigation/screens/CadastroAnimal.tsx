@@ -6,6 +6,8 @@ import SETitle from '../../components/SETitle';
 import SETextInput from '../../components/SETextInput';
 import SERadioButtonGroup from "../../components/SERadioButtonGroup";
 import SECheckboxGroup from "../../components/SECheckboxGroup";
+import SEImagePicker from "../../components/SEImagePicker";
+
 
 const OPTIONS = ['ADOÇÃO','APADRINHAR','AJUDAR'] as const;
 type OptionType = typeof OPTIONS[number];
@@ -31,6 +33,13 @@ const HEALTH_OPTIONS = [
   'Doente',
 ];
 
+const EXIGENCIAS_OPTIONS = [
+  'Termo de adoção',
+  'Fotos da casa',
+  'Visita prévia do animal',
+  'Acompanhamento pós-adoção',
+];
+
 export function CadastroAnimal() {
     const [selectedType, setSelectedType] = useState<OptionType>('ADOÇÃO');
     const [nome, setNome] = useState('');
@@ -40,6 +49,8 @@ export function CadastroAnimal() {
     const [selectedPorte, setSelectedPorte] = useState<string | null>(null);
     const [selectedPersonalities, setSelectedPersonalities] = useState<string[]>([]);
     const [selectedHealth, setSelectedHealth] = useState<string[]>([]);
+    const [selectedExigencias, setSelectedExigencias] = useState<string[]>([]);
+    const [fotoAnimal, setFotoAnimal] = useState<string | null>(null);
 
     return (
       <View style={styles.container}>
@@ -83,6 +94,11 @@ export function CadastroAnimal() {
         <SETitle type="second" color="azul">
           FOTOS DO ANIMAL
         </SETitle>
+
+        <SEImagePicker
+        imageUri={fotoAnimal}
+        onImageChange={setFotoAnimal}
+        />
 
         <SETitle type="second" color="azul">
           ESPÉCIE
@@ -144,10 +160,20 @@ export function CadastroAnimal() {
           onSelectionChange={setSelectedHealth}
         />
 
+        <SETextInput
+          placeholder="Doenças do animal"
+          value={nome}
+          onChangeText={setNome} 
+        />
+
         <SETitle type="second" color="azul">
           EXIGÊNCIAS PARA ADOÇÃO
         </SETitle>
-
+        <SECheckboxGroup
+          options={EXIGENCIAS_OPTIONS}
+          selectedValues={selectedExigencias}
+          onSelectionChange={setSelectedExigencias}
+        />
         <SETitle type="second" color="azul">
           SOBRE O ANIMAL
         </SETitle>
