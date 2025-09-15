@@ -2,10 +2,10 @@ import { Text } from '@react-navigation/elements';
 import { StyleSheet, View } from 'react-native';
 
 
-export function CadastroAnimal() {
+export function Login() {
   return (
     <View style={styles.container}>
-      <Text>CadastroAnimal</Text>
+      <Text>Login</Text>
     </View>
   );
 }

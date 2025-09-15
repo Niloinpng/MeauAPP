@@ -6,6 +6,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { Introducao } from './screens/Introducao';
 import { Adotar } from './screens/Adotar';
 import { CadastroAnimal } from './screens/CadastroAnimal';
+import { Login } from './screens/Login';
 import { CadastroPessoal } from './screens/CadastroPessoal';
 import { FinalizarProcesso } from './screens/FinalizarProcesso';
 import { NotFound } from './screens/NotFound';
@@ -27,6 +28,9 @@ const RootStack = createNativeStackNavigator({
     },
     CadastroPessoal: {
       screen: CadastroPessoal,
+    },
+    Login: {
+      screen: Login,
     },
     FinalizarProcesso: {
       screen: FinalizarProcesso,

@@ -38,7 +38,7 @@ export function Introducao() {
 
         <Button 
           style={styles.loginText}
-          screen="CadastroPessoal"
+          screen="Login"
         >
           Login
         </Button>
