@@ -2,11 +2,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-// Props que o componente recebe:
-// - options: Um array de strings com os textos das opções (ex: ['Macho', 'Fêmea'])
-// - selectedValue: A opção que está atualmente selecionada
-// - onValueChange: Uma função que será chamada quando uma nova opção for selecionada
-// - style: Estilos customizados para o container principal
 interface SERadioButtonGroupProps {
   options: string[];
   selectedValue: string | null;
@@ -22,10 +17,8 @@ const SERadioButtonGroup: React.FC<SERadioButtonGroupProps> = ({
 }) => {
   return (
     <View style={[styles.container, style]}>
-      {/* Mapeamos as opções para renderizar cada botão */}
       {options.map((option) => {
         const isSelected = selectedValue === option;
-
         return (
           <TouchableOpacity
             key={option}
@@ -36,8 +29,7 @@ const SERadioButtonGroup: React.FC<SERadioButtonGroupProps> = ({
             <Icon
               name={isSelected ? 'radio-button-checked' : 'radio-button-unchecked'}
               size={24}
-              // Cor diferente quando está selecionado para dar feedback visual
-              color={isSelected ? '#ffd358' : '#757575'}
+              color={isSelected ? '#757575' : '#757575'}
             />
             <Text style={[styles.optionText, isSelected && styles.selectedOptionText]}>
               {option}
