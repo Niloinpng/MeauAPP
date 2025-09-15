@@ -5,6 +5,7 @@ import SEButton from "../../components/SEButton";
 import SETitle from '../../components/SETitle';
 import SETextInput from '../../components/SETextInput';
 import SERadioButtonGroup from "../../components/SERadioButtonGroup";
+import SECheckboxGroup from "../../components/SECheckboxGroup";
 
 const OPTIONS = ['ADOÇÃO','APADRINHAR','AJUDAR'] as const;
 type OptionType = typeof OPTIONS[number];
@@ -14,6 +15,22 @@ const ESPECIE_OPTIONS = ['Cachorro', 'Gato'];
 const SEXO_OPTIONS = ['Macho', 'Fêmea'];
 const PORTE_OPTIONS = ['Pequeno', 'Médio', 'Grande'];
 
+const PERSONALITY_OPTIONS = [
+  'Brincalhão',
+  'Tímido',
+  'Calmo',
+  'Guarda',
+  'Amoroso',
+  'Preguiçoso',
+];
+
+const HEALTH_OPTIONS = [
+  'Vacinado',
+  'Vermifugado',
+  'Castrado',
+  'Doente',
+];
+
 export function CadastroAnimal() {
     const [selectedType, setSelectedType] = useState<OptionType>('ADOÇÃO');
     const [nome, setNome] = useState('');
@@ -21,6 +38,8 @@ export function CadastroAnimal() {
     const [selectedEspecie, setSelectedEspecie] = useState<string | null>(null);
     const [selectedSexo, setSelectedSexo] = useState<string | null>(null);
     const [selectedPorte, setSelectedPorte] = useState<string | null>(null);
+    const [selectedPersonalities, setSelectedPersonalities] = useState<string[]>([]);
+    const [selectedHealth, setSelectedHealth] = useState<string[]>([]);
 
     return (
       <View style={styles.container}>
@@ -109,9 +128,21 @@ export function CadastroAnimal() {
           TEMPERAMENTO
         </SETitle>
 
+        <SECheckboxGroup
+        options={PERSONALITY_OPTIONS}
+        selectedValues={selectedPersonalities}
+        onSelectionChange={setSelectedPersonalities}
+        />
+
         <SETitle type="second" color="azul">
           SAÚDE
         </SETitle>
+
+        <SECheckboxGroup
+          options={HEALTH_OPTIONS}
+          selectedValues={selectedHealth}
+          onSelectionChange={setSelectedHealth}
+        />
 
         <SETitle type="second" color="azul">
           EXIGÊNCIAS PARA ADOÇÃO
@@ -135,8 +166,8 @@ export function CadastroAnimal() {
   
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    gap: 10,
+    gap: 4,
+    backgroundColor: '#fafafa',
   },
   text: {
     fontSize: 14,

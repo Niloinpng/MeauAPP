@@ -42,29 +42,28 @@ const SERadioButtonGroup: React.FC<SERadioButtonGroupProps> = ({
 };
 
 const styles = StyleSheet.create({
-  // Container principal com flexbox para o layout
   container: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between', // Alinha os itens (inicio, meio, fim)
+    justifyContent: 'space-between',
   },
-  // Container de cada opção individual
+
   optionContainer: {
-    width: '32%', // Garante que teremos 3 colunas (~33%)
+    width: '32%', 
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16, // Espaçamento entre as linhas
+    marginBottom: 16,
   },
-  // Estilo do texto de cada opção
+
   optionText: {
     fontFamily: 'Roboto-Regular',
     fontSize: 14,
     color: '#757575',
-    marginLeft: 8, // Espaço entre o ícone e o texto
+    marginLeft: 8,
   },
-  // Estilo extra para o texto quando selecionado
+
   selectedOptionText: {
-    color: '#434343', // Deixa o texto selecionado um pouco mais escuro
+    color: '#434343', 
   }
 });
 
