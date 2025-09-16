@@ -1,14 +1,15 @@
-import { Button } from '@react-navigation/elements';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image } from 'react-native';
+import SEButton from '../../components/SEButton';
+import { useNavigation } from '@react-navigation/native'; 
 
 export function Introducao() {
+
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.container}>
-
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-
         <Text style={styles.title}>Olá!</Text>
-
         <Text style={styles.subtitle}>
           Bem vindo ao Meau!{'\n'}
           Aqui você pode adotar, doar e ajudar{'\n'}
@@ -43,32 +44,37 @@ export function Introducao() {
           Login
         </Button>
 
+        <TouchableOpacity onPress={() => navigation.navigate('CadastroPessoal')}>
+          <Text style={styles.loginText}>login</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.footer}>
         <Image 
-          //source={require('../assets/images/Meau_marca_2.png')} 
+          source={require('../../assets/images/Meau_marca_2.png')} 
           style={styles.logoImage} 
         />
       </View>
-
-    </View>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+  const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
   },
+
   content: {
-    flex: 1,
+    flex: 0.8, 
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   footer: {
+    flex: 0.2, 
     alignItems: 'center',
-    paddingBottom: 32, 
+    justifyContent: 'center', 
   },
   title: {
     fontFamily: 'Courgette-Regular',
@@ -84,27 +90,18 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     paddingHorizontal: 20, 
   },
-  button: {
-    backgroundColor: '#ffd358',
-    width: 232,
-    height: 40,
-    borderRadius: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 12,
-    fontFamily: 'Roboto-Regular',
-    fontSize: 12,
-    color: '#434343',
+  logoImage: {
+    width: 120,
+    resizeMode: 'contain',
   },
   loginText: {
-    backgroundColor: 'transparent',
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     color: '#88c9bf',
     marginTop: 24,
   },
-  logoImage: {
-    width: 120,
-    resizeMode: 'contain',
-  },
+  buttonContainer: {
+    width: 232,
+    gap: 16,
+  }
 });

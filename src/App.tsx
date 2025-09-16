@@ -24,9 +24,10 @@ export function App() {
   const colorScheme = useColorScheme();
 
   const [loaded] = useFonts({
-    'SpaceMono': require('../assets/fonts/SpaceMono-Regular.ttf'),
-    'Courgette-Regular': require('../assets/fonts/Courgette-Regular.ttf'), 
-    'Roboto-Regular': require('../assets/fonts/Roboto-Regular.ttf'),    
+    'SpaceMono': require('./assets/fonts/SpaceMono-Regular.ttf'),
+    'Courgette-Regular': require('./assets/fonts/Courgette-Regular.ttf'), 
+    'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
+    'Roboto-Medium': require('./assets/fonts/Roboto-Medium.ttf'),   
   });
 
     const [isSplashVisible, setSplashVisible] = useState(true);
