@@ -7,12 +7,9 @@ export function Introducao() {
   const navigation = useNavigation();
 
   return (
-    <View style={styles.container}>
-
+    <SafeAreaView style={styles.container}>
       <View style={styles.content}>
-
         <Text style={styles.title}>Olá!</Text>
-
         <Text style={styles.subtitle}>
           Bem vindo ao Meau!{'\n'}
           Aqui você pode adotar, doar e ajudar{'\n'}
@@ -21,28 +18,20 @@ export function Introducao() {
         </Text>
 
         <View style={styles.buttonContainer}>
-        <SEButton
-          screen="Adotar"
-        >
-          Adotar
-        </SEButton>
-
-        <SEButton 
-        >
-          Ajudar
-        </SEButton>
-
-        <SEButton           
-          screen="CadastroAnimal"
-        >
-          Cadastrar Animal
-        </SEButton>
+          <SEButton screen="Adotar">
+            Adotar
+          </SEButton>
+          <SEButton>
+            Ajudar
+          </SEButton>
+          <SEButton screen="CadastroAnimal">
+            Cadastrar Animal
+          </SEButton>
         </View>
 
         <TouchableOpacity onPress={() => navigation.navigate('CadastroPessoal')}>
           <Text style={styles.loginText}>login</Text>
         </TouchableOpacity>
-
       </View>
 
       <View style={styles.footer}>
@@ -51,24 +40,26 @@ export function Introducao() {
           style={styles.logoImage} 
         />
       </View>
-
-    </View>
+    </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+  const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
   },
+
   content: {
-    flex: 1,
+    flex: 0.8, 
     alignItems: 'center',
     justifyContent: 'center',
   },
+
   footer: {
+    flex: 0.2, 
     alignItems: 'center',
-    paddingBottom: 32, 
+    justifyContent: 'center', 
   },
   title: {
     fontFamily: 'Courgette-Regular',
@@ -96,7 +87,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: 232,
-    marginVertical: 8,
     gap: 16,
   }
 });
