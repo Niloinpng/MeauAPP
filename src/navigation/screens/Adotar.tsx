@@ -1,4 +1,4 @@
-import * as React from 'react';
+mport * as React from 'react';
 import { View, StyleSheet, FlatList } from 'react-native';
 import { PetCard } from '../../components/PetCard'; 
 
@@ -47,6 +47,7 @@ export function Adotar() {
 }
 
 const styles = StyleSheet.create({
+
   container: { 
     flex: 1, 
     backgroundColor: '#fff' 

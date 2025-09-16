@@ -17,17 +17,32 @@ export function Introducao() {
           Qual o seu interesse?
         </Text>
 
-        <View style={styles.buttonContainer}>
-          <SEButton screen="Adotar">
-            Adotar
-          </SEButton>
-          <SEButton>
-            Ajudar
-          </SEButton>
-          <SEButton screen="CadastroAnimal">
-            Cadastrar Animal
-          </SEButton>
-        </View>
+        <Button 
+          style={styles.button}
+          screen="Adotar"
+        >
+          Adotar
+        </Button>
+
+        <Button 
+          style={styles.button}
+        >
+          Ajudar
+        </Button>
+
+        <Button           
+          style={styles.button}
+          screen="CadastroAnimal"
+        >
+          Cadastrar Animal
+        </Button>
+
+        <Button 
+          style={styles.loginText}
+          screen="Login"
+        >
+          Login
+        </Button>
 
         <TouchableOpacity onPress={() => navigation.navigate('CadastroPessoal')}>
           <Text style={styles.loginText}>login</Text>
