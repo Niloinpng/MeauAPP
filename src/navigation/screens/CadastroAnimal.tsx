@@ -1,6 +1,13 @@
 import React, { useState } from "react";
-import { View, StyleSheet,TouchableOpacity  } from "react-native";
-import { Text} from "react-native-paper";
+import { 
+  View, 
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView, 
+  SafeAreaView 
+} from "react-native";
+import { Text } from "react-native-paper";
+import { useNavigation } from '@react-navigation/native'; 
 import SEButton from "../../components/SEButton";
 import SETitle from '../../components/SETitle';
 import SETextInput from '../../components/SETextInput';
@@ -8,223 +15,268 @@ import SERadioButtonGroup from "../../components/SERadioButtonGroup";
 import SECheckboxGroup from "../../components/SECheckboxGroup";
 import SEImagePicker from "../../components/SEImagePicker";
 
-
 const OPTIONS = ['ADOÇÃO','APADRINHAR','AJUDAR'] as const;
 type OptionType = typeof OPTIONS[number];
-
 const AGE_OPTIONS = ['Filhote', 'Adulto', 'Idoso'];
 const ESPECIE_OPTIONS = ['Cachorro', 'Gato'];
 const SEXO_OPTIONS = ['Macho', 'Fêmea'];
 const PORTE_OPTIONS = ['Pequeno', 'Médio', 'Grande'];
+const PERSONALITY_OPTIONS = ['Brincalhão','Tímido','Calmo','Guarda','Amoroso','Preguiçoso'];
+const HEALTH_OPTIONS = ['Vacinado','Vermifugado','Castrado','Doente'];
+const EXIGENCIAS_OPTIONS = ['Termo de adoção','Fotos da casa','Visita prévia do animal','Acompanhamento pós-adoção'];
 
-const PERSONALITY_OPTIONS = [
-  'Brincalhão',
-  'Tímido',
-  'Calmo',
-  'Guarda',
-  'Amoroso',
-  'Preguiçoso',
-];
-
-const HEALTH_OPTIONS = [
-  'Vacinado',
-  'Vermifugado',
-  'Castrado',
-  'Doente',
-];
-
-const EXIGENCIAS_OPTIONS = [
-  'Termo de adoção',
-  'Fotos da casa',
-  'Visita prévia do animal',
-  'Acompanhamento pós-adoção',
-];
 
 export function CadastroAnimal() {
-    const [selectedType, setSelectedType] = useState<OptionType>('ADOÇÃO');
-    const [nome, setNome] = useState('');
-    const [selectedAge, setSelectedAge] = useState<string | null>(null);
-    const [selectedEspecie, setSelectedEspecie] = useState<string | null>(null);
-    const [selectedSexo, setSelectedSexo] = useState<string | null>(null);
-    const [selectedPorte, setSelectedPorte] = useState<string | null>(null);
-    const [selectedPersonalities, setSelectedPersonalities] = useState<string[]>([]);
-    const [selectedHealth, setSelectedHealth] = useState<string[]>([]);
-    const [selectedExigencias, setSelectedExigencias] = useState<string[]>([]);
-    const [fotoAnimal, setFotoAnimal] = useState<string | null>(null);
+  const navigation = useNavigation(); 
 
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  
+  const [selectedType, setSelectedType] = useState<OptionType>('ADOÇÃO');
+  const [nome, setNome] = useState('');
+  const [doencas, setDoencas] = useState('');
+  const [sobre, setSobre] = useState('');
+  const [selectedAge, setSelectedAge] = useState<string | null>(null);
+  const [selectedEspecie, setSelectedEspecie] = useState<string | null>(null);
+  const [selectedSexo, setSelectedSexo] = useState<string | null>(null);
+  const [selectedPorte, setSelectedPorte] = useState<string | null>(null);
+  const [selectedPersonalities, setSelectedPersonalities] = useState<string[]>([]);
+  const [selectedHealth, setSelectedHealth] = useState<string[]>([]);
+  const [selectedExigencias, setSelectedExigencias] = useState<string[]>([]);
+  const [fotoAnimal, setFotoAnimal] = useState<string | null>(null);
+
+  const handleFinalizar = () => {
+    setIsSubmitted(true);
+  };
+  
+  if (isSubmitted) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Tenho interesse em adotar um animal para:</Text>
-
-        <View style={styles.buttonContainer}>
-        {OPTIONS.map((option) => {
-          const isSelected = selectedType === option;
-
-          return (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.button,
-                isSelected ? styles.buttonSelected : styles.buttonUnselected,
-              ]}
-              onPress={() => setSelectedType(option)}
-            >
-              <Text style={[styles.text]}>
-                {option}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-        <SETitle type="principal" color="preta">
-          {selectedType}
-        </SETitle>
-
-        <SETitle type="second" color="azul">
-          NOME DO ANIMAL
-        </SETitle>
-
-        <SETextInput
-          placeholder="Nome do Animal"
-          value={nome}
-          onChangeText={setNome} 
-        />
-
-        <SETitle type="second" color="azul">
-          FOTOS DO ANIMAL
-        </SETitle>
-
-        <SEImagePicker
-        imageUri={fotoAnimal}
-        onImageChange={setFotoAnimal}
-        />
-
-        <SETitle type="second" color="azul">
-          ESPÉCIE
-        </SETitle>
-
-        <SERadioButtonGroup
-          options={ESPECIE_OPTIONS}
-          selectedValue={selectedEspecie}
-          onValueChange={setSelectedEspecie}
-        />
-
-        <SETitle type="second" color="azul">
-          SEXO
-        </SETitle>
-
-        <SERadioButtonGroup
-          options={SEXO_OPTIONS}
-          selectedValue={selectedSexo}
-          onValueChange={setSelectedSexo}
-        />
-
-        <SETitle type="second" color="azul">
-          PORTE
-        </SETitle>
-
-        <SERadioButtonGroup
-          options={PORTE_OPTIONS}
-          selectedValue={selectedPorte}
-          onValueChange={setSelectedPorte}
-        />
-
-        <SETitle type="second" color="azul">
-          IDADE
-        </SETitle>
-
-        <SERadioButtonGroup
-          options={AGE_OPTIONS}
-          selectedValue={selectedAge}
-          onValueChange={setSelectedAge}
-        />
-
-        <SETitle type="second" color="azul">
-          TEMPERAMENTO
-        </SETitle>
-
-        <SECheckboxGroup
-        options={PERSONALITY_OPTIONS}
-        selectedValues={selectedPersonalities}
-        onSelectionChange={setSelectedPersonalities}
-        />
-
-        <SETitle type="second" color="azul">
-          SAÚDE
-        </SETitle>
-
-        <SECheckboxGroup
-          options={HEALTH_OPTIONS}
-          selectedValues={selectedHealth}
-          onSelectionChange={setSelectedHealth}
-        />
-
-        <SETextInput
-          placeholder="Doenças do animal"
-          value={nome}
-          onChangeText={setNome} 
-        />
-
-        <SETitle type="second" color="azul">
-          EXIGÊNCIAS PARA ADOÇÃO
-        </SETitle>
-        <SECheckboxGroup
-          options={EXIGENCIAS_OPTIONS}
-          selectedValues={selectedExigencias}
-          onSelectionChange={setSelectedExigencias}
-        />
-        <SETitle type="second" color="azul">
-          SOBRE O ANIMAL
-        </SETitle>
-
-        <SETextInput
-          placeholder="Compartilhe a história do animal"
-          value={nome}
-          onChangeText={setNome} 
-        />
-
-        <SEButton backgroundColor = '#88C9BF'>COLOCAR PARA {selectedType}</SEButton>
-
-      </View>
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.successContainer}>
+          <Text style={styles.successTitle}>Eba!</Text>
+          <Text style={styles.successBody}>
+            O cadastro do seu pet foi realizado com sucesso!
+          </Text>
+          <Text style={styles.successBody}>
+            Certifique-se que permitiu o envio de
+            notificações por push no campo
+            privacidade do menu configurações do
+            aplicativo. Assim, poderemos te avisar
+            assim que alguém interessado entrar
+            em contato!
+          </Text>
+        </View>
+      </SafeAreaView>
     );
   }
-  
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView 
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer} 
+        showsVerticalScrollIndicator={false}
+      >
+        <Text style={styles.headerText}>Tenho interesse em cadastrar um animal para:</Text>
+
+        <View style={styles.buttonGroup}>
+          {OPTIONS.map((option) => {
+            const isSelected = selectedType === option;
+            return (
+              <TouchableOpacity
+                key={option}
+                style={[
+                  styles.optionButton,
+                  isSelected ? styles.buttonSelected : styles.buttonUnselected,
+                ]}
+                onPress={() => setSelectedType(option)}
+              >
+                <Text style={isSelected ? styles.textSelected : styles.textUnselected}>
+                  {option}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        <Text style={styles.titleText}>
+          {selectedType}
+        </Text>
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">NOME DO ANIMAL</SETitle>
+          <SETextInput
+            placeholder="Nome do Animal"
+            value={nome}
+            onChangeText={setNome}
+          />
+        </View>
+        
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">FOTOS DO ANIMAL</SETitle>
+          <SEImagePicker
+            imageUri={fotoAnimal}
+            onImageChange={setFotoAnimal}
+          />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">ESPÉCIE</SETitle>
+          <SERadioButtonGroup
+            options={ESPECIE_OPTIONS}
+            selectedValue={selectedEspecie}
+            onValueChange={setSelectedEspecie}
+          />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">SEXO</SETitle>
+          <SERadioButtonGroup
+            options={SEXO_OPTIONS}
+            selectedValue={selectedSexo}
+            onValueChange={setSelectedSexo}
+          />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">PORTE</SETitle>
+          <SERadioButtonGroup
+            options={PORTE_OPTIONS}
+            selectedValue={selectedPorte}
+            onValueChange={setSelectedPorte}
+          />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">IDADE</SETitle>
+          <SERadioButtonGroup
+            options={AGE_OPTIONS}
+            selectedValue={selectedAge}
+            onValueChange={setSelectedAge}
+          />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">TEMPERAMENTO</SETitle>
+          <SECheckboxGroup
+            options={PERSONALITY_OPTIONS}
+            selectedValues={selectedPersonalities}
+            onSelectionChange={setSelectedPersonalities}
+          />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">SAÚDE</SETitle>
+          <SECheckboxGroup
+            options={HEALTH_OPTIONS}
+            selectedValues={selectedHealth}
+            onSelectionChange={setSelectedHealth}
+          />
+        </View>
+        
+        <View style={styles.fieldGroup}>
+          <SETextInput
+            placeholder="Doenças do animal (opcional)"
+            value={doencas}
+            onChangeText={setDoencas}
+          />
+        </View>
+
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">EXIGÊNCIAS PARA ADOÇÃO</SETitle>
+          <SECheckboxGroup
+            options={EXIGENCIAS_OPTIONS}
+            selectedValues={selectedExigencias}
+            onSelectionChange={setSelectedExigencias}
+          />
+        </View>
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">SOBRE O ANIMAL</SETitle>
+          <SETextInput
+            placeholder="Compartilhe a história do animal"
+            value={sobre}
+            onChangeText={setSobre}
+            multiline={true} 
+          />
+        </View>
+        <SEButton 
+          backgroundColor='#88C9BF' 
+          onPress={handleFinalizar}
+        >
+          COLOCAR PARA {selectedType}
+        </SEButton>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+  
 const styles = StyleSheet.create({
-  container: {
-    gap: 4,
+  safeArea: {
+    flex: 1,
     backgroundColor: '#fafafa',
   },
-  text: {
+  container: {
+    flex: 1,
+  },
+  contentContainer: {
+    paddingHorizontal: 24, 
+    paddingVertical: 24,
+  },
+  headerText: {
     fontSize: 14,
+    color: '#757575',
+    fontFamily: 'Roboto-Regular',
+    textAlign: 'center',
+    marginBottom: 16,
+  },
+  buttonGroup: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  optionButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  buttonUnselected: {
+    backgroundColor: '#f1f2f2',
+  },
+  buttonSelected: {
+    backgroundColor: '#ffd358',
+  },
+  textUnselected: {
+    color: '#bdbdbd',
+    fontFamily: 'Roboto-Regular',
+  },
+  textSelected: {
     color: '#434343',
     fontFamily: 'Roboto-Regular',
   },
-
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 24, 
+  titleText: {
+    textAlign: 'center',
+    fontFamily: 'Roboto-Medium',
+    fontSize: 16,
+    color: '#434343',
   },
-
-  button: {
-    width: 110,
-    height: 40,
-    shadowColor: '#000',
-    borderRadius: 2,
+  fieldGroup: {
+    marginBottom: 20, 
+  },
+    successContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
+    padding: 30,
+    backgroundColor: '#fafafa',
   },
-
-  buttonUnselected: {
-    backgroundColor: '#bdbdbd',
+  successTitle: {
+    fontFamily: 'Courgette-Regular',
+    fontSize: 72,
+    color: '#ffd358',
   },
-
-  buttonSelected: {
-    backgroundColor: '#92C9BF',
+  successBody: {
+    fontFamily: 'Roboto-Regular',
+    fontSize: 14,
+    color: '#757575',
+    textAlign: 'center',
+    lineHeight: 21, 
   },
 });
-  
