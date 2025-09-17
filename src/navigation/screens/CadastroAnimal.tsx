@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { 
   View, 
@@ -25,6 +24,7 @@ const PORTE_OPTIONS = ['Pequeno', 'Médio', 'Grande'];
 const PERSONALITY_OPTIONS = ['Brincalhão','Tímido','Calmo','Guarda','Amoroso','Preguiçoso'];
 const HEALTH_OPTIONS = ['Vacinado','Vermifugado','Castrado','Doente'];
 const EXIGENCIAS_OPTIONS = ['Termo de adoção','Fotos da casa','Visita prévia do animal','Acompanhamento pós-adoção'];
+
 
 export function CadastroAnimal() {
   const navigation = useNavigation(); 
