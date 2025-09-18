@@ -1,15 +1,11 @@
 import { Button } from '@react-navigation/elements';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView } from 'react-native';
 import { useState } from 'react';
-<<<<<<< HEAD
-import { MaterialIcons } from '@expo/vector-icons'; // Importando ícones
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../../config/firebase"
-=======
 import { MaterialIcons } from '@expo/vector-icons';
 import SEButton from '../../components/SEButton';
 import SETextInput from '../../components/SETextInput'; // Importe o SETextInput
->>>>>>> main
 
 export function CadastroPessoal() {
   const [nome, setNome] = useState('');
