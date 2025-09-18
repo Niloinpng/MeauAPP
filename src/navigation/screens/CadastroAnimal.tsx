@@ -15,7 +15,7 @@ import SERadioButtonGroup from "../../components/SERadioButtonGroup";
 import SECheckboxGroup from "../../components/SECheckboxGroup";
 import SEImagePicker from "../../components/SEImagePicker";
 
-const OPTIONS = ['ADOÇÃO','APADRINHAR','AJUDAR'] as const;
+const OPTIONS = ['ADOÇÃO'] as const;
 type OptionType = typeof OPTIONS[number];
 const AGE_OPTIONS = ['Filhote', 'Adulto', 'Idoso'];
 const ESPECIE_OPTIONS = ['Cachorro', 'Gato'];
@@ -77,26 +77,6 @@ export function CadastroAnimal() {
         showsVerticalScrollIndicator={false}
       >
         <Text style={styles.headerText}>Tenho interesse em cadastrar um animal para:</Text>
-
-        <View style={styles.buttonGroup}>
-          {OPTIONS.map((option) => {
-            const isSelected = selectedType === option;
-            return (
-              <TouchableOpacity
-                key={option}
-                style={[
-                  styles.optionButton,
-                  isSelected ? styles.buttonSelected : styles.buttonUnselected,
-                ]}
-                onPress={() => setSelectedType(option)}
-              >
-                <Text style={isSelected ? styles.textSelected : styles.textUnselected}>
-                  {option}
-                </Text>
-              </TouchableOpacity>
-            );
-          })}
-        </View>
 
         <Text style={styles.titleText}>
           {selectedType}

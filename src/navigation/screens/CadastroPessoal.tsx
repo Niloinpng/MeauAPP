@@ -1,13 +1,18 @@
 import { Button } from '@react-navigation/elements';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, TextInput, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView } from 'react-native';
 import { useState } from 'react';
+<<<<<<< HEAD
 import { MaterialIcons } from '@expo/vector-icons'; // Importando ícones
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../../config/firebase"
+=======
+import { MaterialIcons } from '@expo/vector-icons';
+import SEButton from '../../components/SEButton';
+import SETextInput from '../../components/SETextInput'; // Importe o SETextInput
+>>>>>>> main
 
 export function CadastroPessoal() {
   const [nome, setNome] = useState('');
-  const [sobrenome, setSobrenome] = useState('');
   const [email, setEmail] = useState('');
   const [idade, setIdade] = useState('');
   const [estado, setEstado] = useState('');
@@ -46,7 +51,6 @@ export function CadastroPessoal() {
 
   const handleAddPhoto = () => {
     console.log('Adicionar foto clicado');
-    // Aqui você pode implementar a lógica para adicionar uma foto
   };
 
   return (
@@ -58,83 +62,79 @@ export function CadastroPessoal() {
             <View style={styles.infoBox}>
               <Text style={styles.infoText}>As informações preenchidas serão divulgadas apenas para a pessoa com a qual você realizar o processo de adoção e/ou apadrinhamento, após a formalização do processo</Text>
             </View>
+            
             <View>
               <Text style={styles.sectionText}>INFORMAÇÕES PESSOAIS</Text>
             </View>
-            <TextInput
-              style={styles.input}
+            
+            <SETextInput
               placeholder="Nome Completo"
               value={nome}
               onChangeText={setNome}
               autoCapitalize="words"
             />
 
-            <TextInput
-              style={styles.input}
+            <SETextInput
               placeholder="Idade"
               value={idade}
               onChangeText={setIdade}
-              keyboardType="numeric"
+              type="numeric"
             />
           
-            <TextInput
-              style={styles.input}
+            <SETextInput
               placeholder="E-mail"
               value={email}
               onChangeText={setEmail}
-              autoCapitalize="none"
-              keyboardType="email-address"
+              type="email"
             />
             
-            <TextInput
-              style={styles.input}
+            <SETextInput
               placeholder="Estado"
               value={estado}
               onChangeText={setEstado}
               autoCapitalize="words"
             />
             
-            <TextInput
-              style={styles.input}
+            <SETextInput
               placeholder="Cidade"
               value={cidade}
               onChangeText={setCidade}
               autoCapitalize="words"
             />
 
-            <TextInput
-              style={styles.input}
+            <SETextInput
               placeholder="Endereço"
               value={endereco}
               onChangeText={setEndereco}
               autoCapitalize="words"
             />
             
-            <TextInput
-              style={styles.input}
+            <SETextInput
               placeholder="Telefone"
               value={telefone}
               onChangeText={setTelefone}
               keyboardType="phone-pad"
             />
+            
             <View>
               <Text style={styles.sectionText}>INFORMAÇÕES DE PERFIL</Text>
             </View>
-            <TextInput
-              style={styles.input}
+            
+            <SETextInput
               placeholder="Nome de usuário"
               value={username}
               onChangeText={setUsername}
               autoCapitalize="none"
             />
             
+            {/* Mantive os inputs de senha originais pois o SETextInput não tem ícone de olho integrado */}
             <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
+              <SETextInput
                 placeholder="Senha"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!isPasswordVisible}
+                style={styles.passwordInput}
               />
               <TouchableOpacity 
                 style={styles.eyeIcon}
@@ -145,12 +145,12 @@ export function CadastroPessoal() {
             </View>
             
             <View style={styles.passwordContainer}>
-              <TextInput
-                style={styles.passwordInput}
+              <SETextInput
                 placeholder="Confirmar senha"
                 value={confirmPassword}
                 onChangeText={setConfirmPassword}
                 secureTextEntry={!isConfirmPasswordVisible}
+                style={styles.passwordInput}
               />
               <TouchableOpacity 
                 style={styles.eyeIcon}
@@ -164,21 +164,24 @@ export function CadastroPessoal() {
               <Text style={styles.sectionText}>FOTO DE PERFIL</Text>
             </View>
             
-            {/* Botão quadrado para adicionar foto */}
             <View style={styles.addPhotoContainer}>
               <TouchableOpacity style={styles.addPhotoButton} onPress={handleAddPhoto}>
                 <MaterialIcons name="control-point" size={32} color="#434343" />
                 <Text style={styles.addPhotoText}>Adicionar foto</Text>
               </TouchableOpacity>
             </View>
-            
-            <TouchableOpacity style={styles.button} onPress={handleCadastro}>
-              <Text style={styles.buttonText}>Fazer Cadastro</Text>
-            </TouchableOpacity>
+
+            <SEButton 
+              backgroundColor='#88C9BF' 
+              onPress={handleCadastro}
+            >
+              Fazer Cadastro
+            </SEButton>
             
             <Button 
               style={styles.secondaryButton}
-              screen="Login">
+              screen="Login"
+            >
               <Text style={styles.secondaryButtonText}>Já tenho uma conta</Text>
             </Button>
           </View>
@@ -230,12 +233,6 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     marginBottom: 20,
   },
-  sectionText: {
-    fontFamily: 'Roboto-Regular',
-    fontSize: 14,
-    color: '#88c9bf',
-    marginBottom: 16,
-  },
   infoBox: {
     backgroundColor: '#cfe9e5',
     borderRadius: 4,
@@ -249,15 +246,11 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  input: {
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderRadius: 4,
-    padding: 12,
-    marginBottom: 16,
+  sectionText: {
     fontFamily: 'Roboto-Regular',
     fontSize: 14,
+    color: '#88c9bf',
+    marginBottom: 16,
   },
   passwordContainer: {
     flexDirection: 'row',
@@ -270,9 +263,7 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     flex: 1,
-    padding: 12,
-    fontFamily: 'Roboto-Regular',
-    fontSize: 14,
+    borderWidth: 0, // Remove a borda do SETextInput para não duplicar
   },
   eyeIcon: {
     padding: 12,
@@ -290,7 +281,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e0e0e0',
-    borderStyle: 'dashed', 
+    borderStyle: 'dashed',
   },
   addPhotoText: {
     fontFamily: 'Roboto-Regular',
@@ -299,19 +290,6 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: 'center',
   },
-  button: {
-    backgroundColor: '#88c9bf',
-    borderRadius: 4,
-    padding: 12,
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 12,
-  },
-  buttonText: {
-    fontFamily: 'Roboto-Regular',
-    fontSize: 16,
-    color: '#434343',
-  },
   secondaryButton: {
     backgroundColor: 'transparent',
     borderRadius: 4,
@@ -319,10 +297,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#88c9bf',
+    marginTop: 8,
   },
   secondaryButtonText: {
     fontFamily: 'Roboto-Regular',
-    fontSize: 16,
+    fontSize: 12,
     color: '#88c9bf',
   },
   divider: {
@@ -333,7 +312,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   facebookButton: {
-    backgroundColor: '#1877F2', 
+    backgroundColor: '#1877F2',
     width: 232,
     height: 40,
     borderRadius: 4,
@@ -385,4 +364,8 @@ const styles = StyleSheet.create({
     color: '#757575',
     fontWeight: '500',
   },
+<<<<<<< HEAD
 });
+=======
+}); 
+>>>>>>> main

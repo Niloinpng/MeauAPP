@@ -61,6 +61,24 @@ function HomeStack() {
           headerTintColor: '#434343',
         }}
       />
+      <Stack.Screen 
+        name="CadastroPessoal"
+        component={CadastroPessoal}
+        options={{
+          title: 'Cadastro Pessoal', 
+          headerStyle: { backgroundColor: '#ffd358' },
+          headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '#434343' },
+          headerTintColor: '#434343',
+          headerLeft: () => (
+            <IconButton
+              icon="menu"
+              iconColor="#434343"
+              size={25}
+              onPress={() => navigation.dispatch(DrawerActions.openDrawer())}
+            />
+          ),
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -182,12 +200,22 @@ const RootStack = createNativeStackNavigator({
         headerShown: false,
       },
     },
-    CadastroPessoal: {
-      screen: CadastroPessoal,
-    },
     Login: {
       screen: Login,
+    },    CadastroPessoal: {
+      screen: CadastroPessoal,
+      options: {
+        title: 'Cadastro Pessoal', 
+        headerStyle: { backgroundColor: '#ffd358' },
+        headerTitleStyle: { 
+          fontFamily: 'Roboto-Medium', 
+          fontSize: 20, 
+          color: '#434343' 
+        },
+        headerTintColor: '#434343',
+      }
     },
+
     FinalizarProcesso: {
       screen: FinalizarProcesso,
     },
@@ -208,6 +236,8 @@ export const Navigation = createStaticNavigation(RootStack);
 type HomeStackParamList = {
   AdotarHome: undefined;
   CadastroAnimal: undefined;
+  CadastroPessoal: undefined;
+
 };
 
 type DrawerParamList = {
