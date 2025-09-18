@@ -2,6 +2,8 @@ import { Button } from '@react-navigation/elements';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, TextInput, ScrollView } from 'react-native';
 import { useState } from 'react';
 import { MaterialIcons } from '@expo/vector-icons'; // Importando ícones
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from "../../config/firebase"
 
 export function CadastroPessoal() {
   const [nome, setNome] = useState('');
@@ -18,17 +20,7 @@ export function CadastroPessoal() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
-  const handleCadastro = () => {
-    console.log('Nome:', nome);
-    console.log('Idade:', idade);
-    console.log('Email:', email);
-    console.log('Estado:', estado);
-    console.log('Cidade:', cidade);
-    console.log('Endereço:', endereco);
-    console.log('Telefone:', telefone);
-    console.log('Usuário:', username);
-    console.log('Senha:', password);
-    console.log('Confirmação de senha:', confirmPassword);
+  const handleCadastro = async () => {
     
     if (!nome || !idade || !email || !estado || !cidade || !endereco || !telefone || !username || !password || !confirmPassword) {
       alert('Por favor, preencha todos os campos');
@@ -39,6 +31,17 @@ export function CadastroPessoal() {
       alert('As senhas não coincidem');
       return;
     }
+
+    try{
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
+        alert("Cadastro Realizado com sucesso!")
+    } catch (error: any) {
+        alert("Erro ao Cadastrar: " + error.message);
+    }
+    
+
   };
 
   const handleAddPhoto = () => {

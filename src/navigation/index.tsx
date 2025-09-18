@@ -15,7 +15,7 @@ import { Login } from './screens/Login';
 import { CadastroPessoal } from './screens/CadastroPessoal';
 import { FinalizarProcesso } from './screens/FinalizarProcesso';
 import { NotFound } from './screens/NotFound';
-import { MeuPerfil } from './screens/Meuperfil';
+import { MeuPerfil } from './screens/MeuPerfil';
 import { MeusPets } from './screens/MeusPets';
 import { Favoritos } from './screens/Favoritos';
 import { Eventos } from './screens/Eventos';

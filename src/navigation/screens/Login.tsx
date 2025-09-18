@@ -1,20 +1,31 @@
 import { Button } from '@react-navigation/elements';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, TextInput } from 'react-native';
 import { useState } from 'react';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../config/firebase';
 
 export function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  const handleLogin = () => {
-    console.log('Usuário:', username);
-    console.log('Senha:', password);
+  const handleLogin = async () => {
     
     if (!username || !password) {
       alert('Por favor, preencha todos os campos');
       return;
     }
+
+    try {
+        const userCredential = await signInWithEmailAndPassword(auth, username, password);
+        const user = userCredential.user;
+
+        alert("Login realizado com sucesso!");
+        console.log("Usuário logado", user.email);
+    }catch (error:any) {
+        alert("Erro ao fazer Login: " + error.mesage);
+    }
+
     
   };
 
