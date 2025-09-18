@@ -3,7 +3,6 @@ import SEButton from '../../components/SEButton';
 import { useNavigation } from '@react-navigation/native'; 
 
 export function Introducao() {
-
   const navigation = useNavigation();
 
   return (
@@ -18,17 +17,22 @@ export function Introducao() {
         </Text>
 
         <View style={styles.buttonContainer}>
-          <SEButton screen="Adotar">
+          {/* MUDANÇA AQUI: Trocamos 'screen' por 'onPress' */}
+          <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar' })}>
             Adotar
           </SEButton>
+          
           <SEButton>
             Ajudar
           </SEButton>
-          <SEButton screen="CadastroAnimal">
+          
+          {/* MUDANÇA AQUI: Trocamos 'screen' por 'onPress' com um caminho mais específico */}
+          <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar', params: { screen: 'CadastroAnimal' } })}>
             Cadastrar Animal
           </SEButton>
         </View>
 
+        {/* Esta navegação continua funcionando, pois 'CadastroPessoal' está no mesmo nível que 'Introducao' */}
         <TouchableOpacity onPress={() => navigation.navigate('CadastroPessoal')}>
           <Text style={styles.loginText}>login</Text>
         </TouchableOpacity>
@@ -44,18 +48,16 @@ export function Introducao() {
   );
 }
 
-  const styles = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
   },
-
   content: {
     flex: 0.8, 
     alignItems: 'center',
     justifyContent: 'center',
   },
-
   footer: {
     flex: 0.2, 
     alignItems: 'center',

@@ -2,10 +2,10 @@ import { Text } from '@react-navigation/elements';
 import { StyleSheet, View } from 'react-native';
 
 
-export function FinalizarProcesso() {
+export function Chat() {
   return (
     <View style={styles.container}>
-      <Text>Finalizar Processo</Text>
+      <Text>Chat</Text>
     </View>
   );
 }
