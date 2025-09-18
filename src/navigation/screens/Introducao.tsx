@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image } from 'react-native';
+import { View, Text, StyleSheet, Pressable, SafeAreaView, Image } from 'react-native';
 import SEButton from '../../components/SEButton';
 import { useNavigation } from '@react-navigation/native'; 
 
@@ -7,7 +7,8 @@ export function Introducao() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+      {/* Conteúdo principal */}
+      <View style={styles.mainContent}>
         <Text style={styles.title}>Olá!</Text>
         <Text style={styles.subtitle}>
           Bem vindo ao Meau!{'\n'}
@@ -17,7 +18,6 @@ export function Introducao() {
         </Text>
 
         <View style={styles.buttonContainer}>
-          {/* MUDANÇA AQUI: Trocamos 'screen' por 'onPress' */}
           <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar' })}>
             Adotar
           </SEButton>
@@ -26,18 +26,26 @@ export function Introducao() {
             Ajudar
           </SEButton>
           
-          {/* MUDANÇA AQUI: Trocamos 'screen' por 'onPress' com um caminho mais específico */}
           <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar', params: { screen: 'CadastroAnimal' } })}>
             Cadastrar Animal
           </SEButton>
         </View>
-
-        {/* Esta navegação continua funcionando, pois 'CadastroPessoal' está no mesmo nível que 'Introducao' */}
-        <TouchableOpacity onPress={() => navigation.navigate('CadastroPessoal')}>
-          <Text style={styles.loginText}>login</Text>
-        </TouchableOpacity>
       </View>
 
+      {/* Botão login - separado e clicável */}
+      <View style={styles.loginContainer}>
+        <Pressable 
+          onPress={() => navigation.navigate('CadastroPessoal')}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.5 : 1,
+            padding: 10,
+          })}
+        >
+          <Text style={styles.loginText}>login</Text>
+        </Pressable>
+      </View>
+
+      {/* Footer */}
       <View style={styles.footer}>
         <Image 
           source={require('../../assets/images/Meau_marca_2.png')} 
@@ -53,20 +61,26 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fafafa',
   },
-  content: {
-    flex: 0.8, 
+  mainContent: {
+    flex: 0.7, // Reduzido para dar espaço ao botão
     alignItems: 'center',
     justifyContent: 'center',
   },
-  footer: {
-    flex: 0.2, 
+  loginContainer: {
     alignItems: 'center',
-    justifyContent: 'center', 
+    marginTop: 10,
+    marginBottom: 10,
+  },
+  footer: {
+    alignItems: 'center',
+    marginTop: 'auto',
+    paddingBottom: 20,
   },
   title: {
     fontFamily: 'Courgette-Regular',
     fontSize: 72,
     color: '#ffd358',
+    textAlign: 'center',
   },
   subtitle: {
     fontFamily: 'Roboto-Regular',
@@ -75,17 +89,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 32,
     marginBottom: 32,
-    paddingHorizontal: 20, 
+    paddingHorizontal: 20,
+    lineHeight: 24,
   },
   logoImage: {
     width: 120,
+    height: 80,
     resizeMode: 'contain',
   },
   loginText: {
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     color: '#88c9bf',
-    marginTop: 24,
+    textAlign: 'center',
   },
   buttonContainer: {
     width: 232,
