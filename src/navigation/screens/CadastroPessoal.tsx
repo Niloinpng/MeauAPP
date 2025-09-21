@@ -1,16 +1,11 @@
 import { Button } from '@react-navigation/elements';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView } from 'react-native';
 import { useState } from 'react';
-<<<<<<< HEAD
-import { MaterialIcons } from '@expo/vector-icons'; // Importando ícones
+import { MaterialIcons } from '@expo/vector-icons';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../../config/firebase"
-=======
-import { MaterialIcons } from '@expo/vector-icons';
 import SEButton from '../../components/SEButton';
-import SETextInput from '../../components/SETextInput'; // Importe o SETextInput
->>>>>>> main
-
+import SETextInput from '../../components/SETextInput'; 
 export function CadastroPessoal() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -364,8 +359,5 @@ const styles = StyleSheet.create({
     color: '#757575',
     fontWeight: '500',
   },
-<<<<<<< HEAD
 });
-=======
-}); 
->>>>>>> main
+
