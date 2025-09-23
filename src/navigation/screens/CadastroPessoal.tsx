@@ -360,8 +360,4 @@ const styles = StyleSheet.create({
     color: '#757575',
     fontWeight: '500',
   },
-<<<<<<< HEAD
 });
-=======
-}); 
->>>>>>> main

@@ -1,4 +1,4 @@
-import { NavigatorScreenParams } from '@react-navigation/native';
+import { NavigationContainer, NavigatorScreenParams } from '@react-navigation/native';
 import {
   createStaticNavigation,
   StaticParamList,
@@ -84,7 +84,7 @@ function HomeStack() {
 }
 
 
-function AppDrawer() {
+export function AppDrawer() {
   return (
     <Drawer.Navigator>
       <Drawer.Screen 

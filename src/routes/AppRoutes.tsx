@@ -2,10 +2,10 @@
 import React from "react";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "../context/AuthContext";
-
-import LoginScreen from "../navigation/screens/Login";
-import CadastroScreen from "../navigation/screens/CadastroPessoal";
-import MeuPerfil from "../navigation/screens/MeuPerfil";
+import { AppDrawer, Navigation } from "../navigation/index";
+import { Introducao } from "../navigation/screens/Introducao";
+import { Login } from "../navigation/screens/Login";
+import { CadastroPessoal } from "../navigation/screens/CadastroPessoal";
 
 const Stack = createNativeStackNavigator();
 
@@ -18,12 +18,25 @@ export default function AppRoutes() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
         // Rotas privadas
-        <Stack.Screen name="Perfil" component={MeuPerfil} />
+        <Stack.Screen 
+          name="AppDrawer"
+          component={AppDrawer}
+          />
       ) : (
         // Rotas públicas
         <>
-          <Stack.Screen name="Login" component={LoginScreen} />
-          <Stack.Screen name="Cadastro" component={CadastroScreen} />
+          <Stack.Screen 
+            name="Introducao" 
+            component={Introducao} 
+            />
+          <Stack.Screen 
+            name="Login" 
+            component={Login} 
+            />
+          <Stack.Screen 
+            name="CadastroPessoal" 
+            component={CadastroPessoal} 
+            />
         </>
       )}
     </Stack.Navigator>
