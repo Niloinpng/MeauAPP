@@ -18,7 +18,7 @@ export default function AppRoutes() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       {user ? (
         // Rotas privadas
-        <Stack.Screen 
+       <Stack.Screen 
           name="AppDrawer"
           component={AppDrawer}
           />
