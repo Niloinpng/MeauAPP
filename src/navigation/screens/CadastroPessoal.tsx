@@ -5,7 +5,7 @@ import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../../config/firebase"
 import { MaterialIcons } from '@expo/vector-icons';
 import SEButton from '../../components/SEButton';
-import SETextInput from '../../components/SETextInput'; // Importe o SETextInput
+import SETextInput from '../../components/SETextInput'; 
 
 export function CadastroPessoal() {
   const [nome, setNome] = useState('');
@@ -178,7 +178,7 @@ export function CadastroPessoal() {
               style={styles.secondaryButton}
               screen="Login"
             >
-              <Text style={styles.secondaryButtonText}>Já tenho uma conta</Text>
+              Já tenho uma conta
             </Button>
           </View>
 
@@ -259,7 +259,7 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     flex: 1,
-    borderWidth: 0, // Remove a borda do SETextInput para não duplicar
+    borderWidth: 0,
   },
   eyeIcon: {
     padding: 12,
@@ -294,6 +294,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#88c9bf',
     marginTop: 8,
+    fontFamily: 'Roboto-Regular',
+    fontSize: 12,
+    color: '#88c9bf',
   },
   secondaryButtonText: {
     fontFamily: 'Roboto-Regular',
