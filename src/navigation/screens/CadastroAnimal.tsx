@@ -16,7 +16,7 @@ import SERadioButtonGroup from "../../components/SERadioButtonGroup";
 import SECheckboxGroup from "../../components/SECheckboxGroup";
 import SEImagePicker from "../../components/SEImagePicker";
 
-import { db } from "../../config/firebase";
+import { db, auth } from "../../config/firebase";
 import { collection, addDoc } from "firebase/firestore"; 
 
 const OPTIONS = ['ADOÇÃO'] as const;
@@ -55,6 +55,14 @@ const handleFinalizar = async () => {
       return;
     }
 
+    const user = auth.currentUser;
+    if (!user) {
+      Alert.alert("Erro", "Você precisa estar logado para cadastrar um animal.");
+      setLoading(false);
+      return;
+    }
+    const userId = user.uid; 
+
     setLoading(true);
 
     try {
@@ -71,6 +79,7 @@ const handleFinalizar = async () => {
         sobre: sobre.trim(),
         tipoCadastro: selectedType,
         dataCadastro: new Date(),
+        dono: userId,
       };
 
       console.log("Dados do animal a serem salvos: ", animalData);
