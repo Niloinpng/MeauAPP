@@ -4,7 +4,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView, 
-  SafeAreaView 
+  SafeAreaView,
+  Alert
 } from "react-native";
 import { Text } from "react-native-paper";
 import { useNavigation } from '@react-navigation/native'; 
@@ -14,6 +15,9 @@ import SETextInput from '../../components/SETextInput';
 import SERadioButtonGroup from "../../components/SERadioButtonGroup";
 import SECheckboxGroup from "../../components/SECheckboxGroup";
 import SEImagePicker from "../../components/SEImagePicker";
+
+import { db } from "../../config/firebase";
+import { collection, addDoc } from "firebase/firestore"; 
 
 const OPTIONS = ['ADOÇÃO'] as const;
 type OptionType = typeof OPTIONS[number];
@@ -30,7 +34,8 @@ export function CadastroAnimal() {
   const navigation = useNavigation(); 
 
   const [isSubmitted, setIsSubmitted] = useState(false);
-  
+  const [loading, setLoading] = useState(false);
+
   const [selectedType, setSelectedType] = useState<OptionType>('ADOÇÃO');
   const [nome, setNome] = useState('');
   const [doencas, setDoencas] = useState('');
@@ -44,8 +49,42 @@ export function CadastroAnimal() {
   const [selectedExigencias, setSelectedExigencias] = useState<string[]>([]);
   const [fotoAnimal, setFotoAnimal] = useState<string | null>(null);
 
-  const handleFinalizar = () => {
-    setIsSubmitted(true);
+const handleFinalizar = async () => {
+    if (!nome.trim() || !selectedEspecie || !selectedSexo || !selectedPorte || !selectedAge) {
+      Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios (nome, espécie, sexo, porte e idade).");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const animalData = {
+        nome: nome.trim(),
+        especie: selectedEspecie,
+        sexo: selectedSexo,
+        porte: selectedPorte,
+        idade: selectedAge,
+        temperamento: selectedPersonalities,
+        saude: selectedHealth,
+        exigencias: selectedExigencias,
+        doencas: doencas.trim(),
+        sobre: sobre.trim(),
+        tipoCadastro: selectedType,
+        dataCadastro: new Date(),
+      };
+
+      console.log("Dados do animal a serem salvos: ", animalData);
+
+      await addDoc(collection(db, "animais"), animalData);
+      
+      setIsSubmitted(true);
+
+    } catch (error) {
+      console.error("Erro ao cadastrar animal: ", error);
+      Alert.alert("Erro", "Ocorreu um erro ao tentar cadastrar o animal.");
+    } finally {
+      setLoading(false);
+    }
   };
   
   if (isSubmitted) {
@@ -181,7 +220,7 @@ export function CadastroAnimal() {
           backgroundColor='#88C9BF' 
           onPress={handleFinalizar}
         >
-          COLOCAR PARA {selectedType}
+          {loading ? 'CADASTRANDO...' : `COLOCAR PARA ${selectedType}`}
         </SEButton>
       </ScrollView>
     </SafeAreaView>
