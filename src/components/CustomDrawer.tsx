@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DrawerContentScrollView, DrawerContentComponentProps } from '@react-navigation/drawer';
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity , Alert} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import SEButton from './SEButton';
+
+import { auth, db } from "../config/firebase";
+import { signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { CommonActions } from '@react-navigation/native';
+
 
 const DrawerItem = ({ label, onPress }: any) => (
   <TouchableOpacity
@@ -18,6 +24,49 @@ const DrawerItem = ({ label, onPress }: any) => (
 export default function CustomDrawer(props: DrawerContentComponentProps) {
   const { navigation } = props;
   const [openSection, setOpenSection] = useState<string | null>('User'); 
+
+  const [userName, setUserName] = useState('Carregando...');
+
+  useEffect(() => {
+  const fetchUserData = async () => {
+    const user = auth.currentUser;
+    if (user) {
+      // Cria uma referência ao documento do usuário na coleção 'usuários'
+      const userDocRef = doc(db, "usuários", user.uid);
+      try {
+        const docSnap = await getDoc(userDocRef);
+        if (docSnap.exists()) {
+          // Se o documento existir, pega o campo 'nome' e atualiza o estado
+          setUserName(docSnap.data().nome);
+        } else {
+          console.log("Documento do usuário não encontrado no Firestore!");
+          setUserName("Usuário"); // Um nome padrão
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do usuário:", error);
+        setUserName("Usuário");
+      }
+    }
+  };
+
+    fetchUserData();
+  }, []); 
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      // Após o logout, reseta a navegação para a tela de Introdução
+      navigation.dispatch(
+        CommonActions.reset({
+          index: 0,
+          routes: [{ name: 'Introducao' }],
+        })
+      );
+    } catch (error) {
+      console.error("Erro ao sair:", error);
+      Alert.alert("Erro", "Não foi possível sair. Tente novamente.");
+    }
+  };
 
   const toggleSection = (sectionName: string) => {
     setOpenSection(openSection === sectionName ? null : sectionName);
@@ -37,7 +86,7 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
           style={[styles.sectionHeader, { backgroundColor: '#88c9bf' }]} 
           onPress={() => toggleSection('User')}
         >
-          <Text style={styles.sectionLabel}>Nome do Usuário</Text>
+          <Text style={styles.sectionLabel}>{userName}</Text>
           <Icon name={openSection === 'User' ? 'expand-less' : 'expand-more'} size={24} color="#757575" />
         </TouchableOpacity>
         {openSection === 'User' && (
@@ -104,7 +153,9 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
       </View>
       
       <View style={styles.footer}>
-         <SEButton backgroundColor="#ffd358">SAIR</SEButton>
+         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+           <Text style={styles.logoutButtonText}>SAIR</Text>
+         </TouchableOpacity>
       </View>
     </DrawerContentScrollView>
   );
@@ -165,5 +216,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
     padding: 16,
+  },
+  logoutButton: {
+    width: '100%',
+    backgroundColor: '#88c9bf',
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  logoutButtonText: {
+    color: '#434343',
+    fontFamily: 'Roboto-Medium',
+    fontSize: 14,
   },
 });
