@@ -4,7 +4,6 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import SEButton from './SEButton';
 
-// Componente para um item de menu (agora sem lógica de 'focus')
 const DrawerItem = ({ label, onPress }: any) => (
   <TouchableOpacity
     onPress={onPress}
@@ -18,7 +17,7 @@ const DrawerItem = ({ label, onPress }: any) => (
 
 export default function CustomDrawer(props: DrawerContentComponentProps) {
   const { navigation } = props;
-  const [openSection, setOpenSection] = useState<string | null>('User'); // Deixa a primeira seção aberta por padrão
+  const [openSection, setOpenSection] = useState<string | null>('User'); 
 
   const toggleSection = (sectionName: string) => {
     setOpenSection(openSection === sectionName ? null : sectionName);
@@ -34,9 +33,8 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
       </View>
 
       <View>
-        {/* --- SEÇÃO USUÁRIO --- */}
         <TouchableOpacity 
-          style={[styles.sectionHeader, { backgroundColor: '#E0F2F1' }]} // Cor de fundo do grupo
+          style={[styles.sectionHeader, { backgroundColor: '#88c9bf' }]} 
           onPress={() => toggleSection('User')}
         >
           <Text style={styles.sectionLabel}>Nome do Usuário</Text>
@@ -51,9 +49,8 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
           </View>
         )}
 
-        {/* --- SEÇÃO ATALHOS --- */}
         <TouchableOpacity 
-          style={[styles.sectionHeader, { backgroundColor: '#FFF3E0' }]} // Cor de fundo do grupo
+          style={[styles.sectionHeader, { backgroundColor: '#fee29b' }]} 
           onPress={() => toggleSection('Atalhos')}
         >
           <View style={styles.sectionTitleContainer}>
@@ -64,14 +61,13 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
         </TouchableOpacity>
         {openSection === 'Atalhos' && (
           <View style={styles.subItemContainer}>
-            <DrawerItem label="Adotar" onPress={() => navigation.navigate('Adotar')} />
-            <DrawerItem label="Cadastrar Animal" onPress={() => navigation.navigate('Cadastrar Animal')} />
+            <DrawerItem label="Cadastrar um pet" onPress={() => navigation.navigate('Cadastrar Animal')} />
+            <DrawerItem label="Adotar um pet" onPress={() => navigation.navigate('Adotar')} />
           </View>
         )}
         
-        {/* --- SEÇÃO INFORMAÇÕES --- */}
         <TouchableOpacity 
-          style={[styles.sectionHeader, { backgroundColor: '#E1F5FE' }]} // Cor de fundo do grupo
+          style={[styles.sectionHeader, { backgroundColor: '#cfe9e5' }]} 
           onPress={() => toggleSection('Informações')}
         >
           <View style={styles.sectionTitleContainer}>
@@ -85,14 +81,13 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
             <DrawerItem label="Dicas" onPress={() => navigation.navigate('Dicas')} />
             <DrawerItem label="Eventos" onPress={() => navigation.navigate('Eventos')} />
             <DrawerItem label="Legislação" onPress={() => navigation.navigate('Legislacao')} />
-            <DrawerItem label="Termo de Adoção" onPress={() => navigation.navigate('Termo')} />
-            <DrawerItem label="Histórias" onPress={() => navigation.navigate('Historias')} />
+            <DrawerItem label="Termo de adoção" onPress={() => navigation.navigate('Termo')} />
+            <DrawerItem label="Histórias de adoção" onPress={() => navigation.navigate('Historias')} />
           </View>
         )}
 
-        {/* --- SEÇÃO CONFIGURAÇÃO --- */}
         <TouchableOpacity 
-          style={[styles.sectionHeader, { backgroundColor: '#F3E5F5' }]} // Cor de fundo do grupo
+          style={[styles.sectionHeader, { backgroundColor: '#e6e7e8' }]} 
           onPress={() => toggleSection('Configuração')}
         >
           <View style={styles.sectionTitleContainer}>
@@ -103,7 +98,7 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
         </TouchableOpacity>
         {openSection === 'Configuração' && (
           <View style={styles.subItemContainer}>
-            <DrawerItem label="Política de Privacidade" onPress={() => navigation.navigate('Privacidade')} />
+            <DrawerItem label="Privacidade" onPress={() => navigation.navigate('Privacidade')} />
           </View>
         )}
       </View>
@@ -128,20 +123,20 @@ const styles = StyleSheet.create({
     borderRadius: 32,
     marginBottom: 12,
   },
-  // Estilo para os itens de menu (sub-itens)
+
   drawerItem: {
-    backgroundColor: '#fff', // Fundo branco
+    backgroundColor: '#fff',
     paddingVertical: 14,
     paddingHorizontal: 16,
-    borderBottomWidth: 1, // Linha separadora
-    borderBottomColor: '#f0f0f0', // Cor da linha
+    borderBottomWidth: 1, 
+    borderBottomColor: '#f0f0f0', 
   },
   drawerLabel: {
     fontSize: 14,
     fontFamily: 'Roboto-Regular',
     color: '#434343',
   },
-  // Estilo para o cabeçalho de uma seção expansível
+
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -151,7 +146,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#e0e0e0',
   },
-  // Container para alinhar ícone e texto do cabeçalho
+
   sectionTitleContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -162,9 +157,9 @@ const styles = StyleSheet.create({
     color: '#434343',
     marginLeft: 16,
   },
-  // Container para os sub-itens
+ 
   subItemContainer: {
-    paddingLeft: 16, // Indentação para os sub-itens
+    paddingLeft: 16, 
   },
   footer: {
     flex: 1,
