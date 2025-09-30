@@ -2,6 +2,7 @@ import React from "react";
 import { View, ScrollView, StyleSheet, Image } from "react-native";
 import { Text, IconButton, Button, FAB } from "react-native-paper";
 import { PhotoCarousel } from "../../components/PhotoCarousel";
+import { Separator } from "../../components/Separator";
 
 type Pet = {
   name: string;
@@ -25,10 +26,10 @@ type Pet = {
 
 const mockPet: Pet = {
   name: "Pequi",
-  age: "adult",
-  species: "dog",
-  sex: "male",
-  size: "small",
+  age: "Adulto",
+  species: "Cachorro",
+  sex: "Macho",
+  size: "Pequeno",
   temperament: ["brincalhão", "dócil"],
   vaccinated: false,
   dewormed: true,
@@ -55,33 +56,40 @@ export const MeusPets: React.FC = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
-
         <PhotoCarousel photos={pet.photos} />
 
         <View style={styles.infoRow}>
-          <Info label="SEXO" value={pet.sex === "male" ? "Macho" : "Fêmea"} />
-          <Info label="LOCALIZAÇÃO" value={pet.city} />
+          <Text style={styles.petName}>{pet.name}</Text>
         </View>
+
+        <View style={styles.infoRow}>
+          <Info label="SEXO" value={pet.sex === "male" ? "Macho" : "Fêmea"} />
+          <Info label="PORTE" value={pet.size} />
+          <Info label="IDADE" value={pet.age} />
+        </View>
+
+        <View style={styles.infoRow}>
+          <Info label="LOCALIZAÇÃO" value={pet.city} />
+          </View>
 
         <View style={styles.infoRow}>
           <Info label="CASTRADO" value={pet.castrated ? "Sim" : "Não"} />
           <Info label="VERMIFUGADO" value={pet.dewormed ? "Sim" : "Não"} />
+        </View>
+
+        <View style={styles.infoRow}>
           <Info label="VACINADO" value={pet.vaccinated ? "Sim" : "Não"} />
+          <Info label="DOENÇAS" value={pet.diseases ?? "Nenhuma"} />
         </View>
 
         <View style={styles.infoRow}>
           <Info label="TEMPERAMENTO" value={pet.temperament.join(", ")} />
         </View>
 
-        <View style={styles.infoRow}>
-          <Info label="DOENÇAS" value={pet.diseases ?? "Nenhuma"} />
-        </View>
-
-        <View style={styles.infoRow}>
-          <Info label="PORTE" value={pet.size} />
-          <Info label="IDADE" value={pet.age} />
-        </View>
-
+        <Section
+          title={`O ${pet.name.toUpperCase()} PRECISA DE`}
+          text={pet.needs ?? ""}
+        />
         <Section
           title={`MAIS SOBRE ${pet.name.toUpperCase()}`}
           text={pet.description ?? ""}
@@ -96,17 +104,11 @@ export const MeusPets: React.FC = () => {
           </Button>
         </View>
 
-        {/* DONOR REQUIREMENTS */}
         <Section
           title="EXIGÊNCIAS DO DOADOR"
           text={pet.donorRequirements ?? ""}
         />
 
-        {/* PET NEEDS */}
-        <Section
-          title={`O ${pet.name.toUpperCase()} PRECISA DE`}
-          text={pet.needs ?? ""}
-        />
       </ScrollView>
     </View>
   );
@@ -121,8 +123,9 @@ const Info = ({ label, value }: { label: string; value: string }) => (
 
 const Section = ({ title, text }: { title: string; text: string }) => (
   <View style={styles.section}>
-    <Text style={styles.sectionTitle}>{title}</Text>
-    <Text style={styles.sectionText}>{text}</Text>
+    <Separator/>
+    <Text style={styles.infoLabel}>{title}</Text>
+    <Text style={styles.infoValue}>{text}</Text>
   </View>
 );
 
@@ -148,8 +151,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginTop: 16,
   },
+  petName: { fontSize: 16, fontFamily: "Roboto-Medium", color: "#434343" },
 
-  infoLabel: { fontSize: 12, fontFamily: "Roboto-Regular", color: "#589b9b" },
+  infoLabel: { fontSize: 12, fontFamily: "Roboto-Regular", color: "#589b9b", marginBottom: 8, grow:1 },
   infoValue: { fontSize: 14, fontFamily: "Roboto-Regular", color: "#757575" },
 
   section: { paddingHorizontal: 16, marginTop: 24 },
