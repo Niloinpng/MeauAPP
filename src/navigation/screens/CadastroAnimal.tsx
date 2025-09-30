@@ -48,38 +48,93 @@ export function CadastroAnimal() {
   const [selectedExigencias, setSelectedExigencias] = useState<string[]>([]);
   const [fotosAnimal, setFotosAnimal] = useState<string[]>([]);
 
-  // Função para fazer upload das imagens
+  const compressImage = async (uri: string, quality: number = 0.85): Promise<Blob> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        
+        const response = await fetch(uri);
+        const originalBlob = await response.blob();
+
+        if (typeof document !== 'undefined') {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d')!;
+
+            const MAX_WIDTH = 1200;
+            const MAX_HEIGHT = 1200;
+            let { width, height } = img;
+
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+              }
+            } else {
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(
+              (compressedBlob) => {
+                if (compressedBlob) {
+                  resolve(compressedBlob);
+                } else {
+                  reject(new Error('Falha na compressão'));
+                }
+              },
+              'image/jpeg',
+              quality
+            );
+          };
+
+          img.onerror = reject;
+          img.src = URL.createObjectURL(originalBlob);
+        } else {
+          resolve(originalBlob);
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
   const uploadImages = async (imageUris: string[], userId: string): Promise<string[]> => {
-    console.log("Iniciando upload de", imageUris.length, "imagens");
     
     const uploadPromises = imageUris.map(async (uri, index) => {
       try {
-        console.log(`Processando imagem ${index + 1}:`, uri);
         
-        // Buscar a imagem
-        const response = await fetch(uri);
-        console.log(`Imagem ${index + 1} fetch concluído`);
+        const compressedBlob = await compressImage(uri, 0.85);
         
-        const blob = await response.blob();
-        console.log(`Imagem ${index + 1} blob criado, tamanho:`, blob.size);
 
-        // Criar referência no Storage
         const imageName = `animais/${userId}/${Date.now()}_${index}.jpg`;
         const storageRef = ref(storage, imageName);
-        console.log(`Referência storage criada:`, imageName);
 
-        // Fazer upload
-        console.log(`Iniciando upload da imagem ${index + 1}`);
-        const snapshot = await uploadBytes(storageRef, blob);
-        console.log(`Upload imagem ${index + 1} concluído`);
+        const metadata = {
+          contentType: 'image/jpeg',
+          customMetadata: {
+            'uploadedBy': userId,
+            'uploadTime': new Date().toISOString(),
+            'compressionQuality': '85%',
+            'originalSize': (await (await fetch(uri)).blob()).size.toString(),
+            'compressedSize': compressedBlob.size.toString(),
+            'reduction': `${((1 - compressedBlob.size / (await (await fetch(uri)).blob()).size) * 100).toFixed(1)}%`
+          }
+        };
+
+        const snapshot = await uploadBytes(storageRef, compressedBlob, metadata);
         
-        // Obter URL de download
         const downloadURL = await getDownloadURL(snapshot.ref);
-        console.log(`URL download imagem ${index + 1}:`, downloadURL);
         
         return downloadURL;
       } catch (error) {
-        console.error(`Erro ao fazer upload da imagem ${index + 1}:`, error);
         throw new Error(`Falha no upload da imagem ${index + 1}: ${error}`);
       }
     });
@@ -88,41 +143,32 @@ export function CadastroAnimal() {
   };
 
   const handleFinalizar = async () => {
-    console.log("Botão pressionado - iniciando handleFinalizar");
     
     if (!nome.trim() || !selectedEspecie || !selectedSexo || !selectedPorte || !selectedAge) {
-      console.log("Validação falhou - campos obrigatórios");
       Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios (nome, espécie, sexo, porte e idade).");
       return;
     }
 
     if (fotosAnimal.length === 0) {
-      console.log("Validação falhou - nenhuma foto");
       Alert.alert("Atenção", "Por favor, adicione pelo menos uma foto do animal.");
       return;
     }
 
     const user = auth.currentUser;
     if (!user) {
-      console.log("Usuário não autenticado");
       Alert.alert("Erro", "Você precisa estar logado para cadastrar um animal.");
       return;
     }
     
     const userId = user.uid; 
-    console.log("Usuário autenticado:", userId);
 
     setLoading(true);
-    console.log("Loading setado para true");
 
     try {
-      // Fazer upload das imagens
       let fotosUrls: string[] = [];
       if (fotosAnimal.length > 0) {
-        console.log("Iniciando upload das fotos...");
-        Alert.alert("Aguarde", "Fazendo upload das fotos...");
+        Alert.alert("Aguarde", "Comprimindo e fazendo upload das imagens...");
         fotosUrls = await uploadImages(fotosAnimal, userId);
-        console.log("Upload de fotos concluído, URLs:", fotosUrls);
       }
 
       const animalData = {
@@ -141,27 +187,20 @@ export function CadastroAnimal() {
         dono: userId,
         fotos: fotosUrls,
         fotoPrincipal: fotosUrls[0] || null,
+        metadata: {
+          storageType: 'firebase_storage',
+          imagesCount: fotosUrls.length,
+          compression: '85%_quality',
+          timestamp: new Date().toISOString()
+        }
       };
 
-      console.log("Dados do animal a serem salvos: ", animalData);
-      console.log("Tentando salvar no Firestore...");
-
-      // Adicionar timeout para evitar travamento
-      const firestorePromise = addDoc(collection(db, "animais"), animalData);
+      await addDoc(collection(db, "animais"), animalData);
       
-      // Timeout de 30 segundos
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error("Timeout - operação demorou muito")), 30000)
-      );
-
-      await Promise.race([firestorePromise, timeoutPromise]);
-      
-      console.log("Animal salvo com sucesso no Firestore");
+      Alert.alert("Sucesso", "Animal cadastrado! Imagens comprimidas para 85% de qualidade.");
       setIsSubmitted(true);
-      console.log("isSubmitted setado para true");
 
     } catch (error) {
-      console.error("Erro completo ao cadastrar animal: ", error);
       
       let errorMessage = "Ocorreu um erro ao tentar cadastrar o animal.";
       
@@ -172,18 +211,18 @@ export function CadastroAnimal() {
           errorMessage = "Erro ao conectar com o banco de dados. Tente novamente.";
         } else if (error.message.includes("upload")) {
           errorMessage = "Erro ao fazer upload das imagens. Verifique se as imagens são válidas.";
+        } else if (error.message.includes("permissions")) {
+          errorMessage = "Sem permissão. Verifique as regras do Storage.";
         }
       }
       
       Alert.alert("Erro", errorMessage);
     } finally {
-      console.log("Finalizando - setando loading para false");
       setLoading(false);
     }
   };
   
   if (isSubmitted) {
-    console.log("Renderizando tela de sucesso");
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.successContainer}>
@@ -195,16 +234,13 @@ export function CadastroAnimal() {
             Certifique-se que permitiu o envio de
             notificações por push no campo
             privacidade do menu configurações do
-            aplicativo. Assim, poderemos te avisar
-            assim que alguém interessado entrar
-            em contato!
+            aplicativo.
           </Text>
         </View>
       </SafeAreaView>
     );
   }
 
-  console.log("Renderizando formulário normal");
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView 
@@ -324,24 +360,8 @@ export function CadastroAnimal() {
         >
           {loading ? 'CADASTRANDO...' : `COLOCAR PARA ${selectedType}`}
         </SEButton>
-        
-        {/* Botão de debug - remova em produção */}
-        <SEButton 
-          backgroundColor='#FF6B6B' 
-          onPress={() => {
-            console.log("=== DEBUG INFO ===");
-            console.log("fotosAnimal:", fotosAnimal);
-            console.log("nome:", nome);
-            console.log("especie:", selectedEspecie);
-            console.log("sexo:", selectedSexo);
-            console.log("porte:", selectedPorte);
-            console.log("idade:", selectedAge);
-            console.log("user:", auth.currentUser?.uid);
-          }}
-          style={{ marginTop: 10 }}
-        >
-          DEBUG INFO
-        </SEButton>
+
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -366,35 +386,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 16,
   },
-  buttonGroup: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 20,
-  },
-  optionButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    borderRadius: 4,
-  },
-  buttonUnselected: {
-    backgroundColor: '#f1f2f2',
-  },
-  buttonSelected: {
-    backgroundColor: '#ffd358',
-  },
-  textUnselected: {
-    color: '#bdbdbd',
-    fontFamily: 'Roboto-Regular',
-  },
-  textSelected: {
-    color: '#434343',
-    fontFamily: 'Roboto-Regular',
-  },
   titleText: {
     textAlign: 'center',
     fontFamily: 'Roboto-Medium',
     fontSize: 16,
     color: '#434343',
+    marginBottom: 20,
   },
   fieldGroup: {
     marginBottom: 20, 
@@ -410,6 +407,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Courgette-Regular',
     fontSize: 72,
     color: '#ffd358',
+    marginBottom: 20,
   },
   successBody: {
     fontFamily: 'Roboto-Regular',
@@ -417,5 +415,6 @@ const styles = StyleSheet.create({
     color: '#757575',
     textAlign: 'center',
     lineHeight: 21, 
+    marginBottom: 15,
   },
 });
