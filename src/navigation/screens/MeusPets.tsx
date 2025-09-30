@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   },
   petName: { fontSize: 16, fontFamily: "Roboto-Medium", color: "#434343" },
 
-  infoLabel: { fontSize: 12, fontFamily: "Roboto-Regular", color: "#589b9b", marginBottom: 8, grow:1 },
+  infoLabel: { fontSize: 12, fontFamily: "Roboto-Regular", color: "#589b9b", marginBottom: 8 },
   infoValue: { fontSize: 14, fontFamily: "Roboto-Regular", color: "#757575" },
 
   section: { paddingHorizontal: 16, marginTop: 24 },
