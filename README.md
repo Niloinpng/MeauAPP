@@ -1,67 +1,60 @@
-# Starter Template with React Navigation
+O **Meau** é um aplicativo móvel desenvolvido para conectar pessoas que desejam adotar animais de estimação com abrigos e tutores que têm gatos e cachorros disponíveis para adoção. Nosso objetivo é facilitar o processo de adoção responsável, proporcionando uma experiência intuitiva e segura para encontrar seu novo companheiro.
 
-This is a minimal starter template for React Native apps using Expo and React Navigation.
+### Pré-requisitos
 
-It includes the following:
+- Node.js (versão 16 ou superior)
+- npm ou yarn
 
-- Example [Native Stack](https://reactnavigation.org/docs/native-stack-navigator) with a nested [Bottom Tab](https://reactnavigation.org/docs/bottom-tab-navigator)
-- Web support with [React Native for Web](https://necolas.github.io/react-native-web/)
-- TypeScript support and configured for React Navigation
-- Automatic [deep link](https://reactnavigation.org/docs/deep-linking) and [URL handling configuration](https://reactnavigation.org/docs/configuring-links)
-- Theme support [based on system appearance](https://reactnavigation.org/docs/themes/#using-the-operating-system-preferences)
-- Expo [Development Build](https://docs.expo.dev/develop/development-builds/introduction/) with [Continuous Native Generation](https://docs.expo.dev/workflow/continuous-native-generation/)
+### Instalação
 
-## Getting Started
+1. Clone o repositório do projeto:
 
-1. Create a new project using this template:
+```sh
+git clone https://github.com/Niloinpng/MeauAPP.git
+cd MeauAPP
+```
 
-   ```sh
-   npx create-expo-app@latest --template react-navigation/template
-   ```
+2. Instale as dependências:
 
-2. Edit the `app.json` file to configure the `name`, `slug`, `scheme` and bundle identifiers (`ios.bundleIdentifier` and `android.bundleIdentifier`) for your app.
+```sh
+npm install
+# ou
+yarn install
+```
 
-3. Edit the `src/App.tsx` file to start working on your app.
+### Executando o App
 
-## Running the app
+- Inicie o servidor de desenvolvimento:
 
-- Install the dependencies:
+```sh
+npm start
+# ou
+npx expo start
+```
 
-  ```sh
-  npm install
-  ```
+- Para plataformas específicas:
 
-- Start the development server:
+```sh
+npm run android # Para Android
+```
 
-  ```sh
-  npm start
+- No terminal do servidor de desenvolvimento, você pode pressionar:
+  - `a` para abrir o emulador/dispositivo Android
+  - `w` para abrir no navegador web
 
-  npx expo start
-  ```
 
-- Build and run iOS and Android development builds:
+## Estrutura do Projeto
 
-  ```sh
-  npm run ios
-  # or
-  npm run android
-  ```
+```
+src/
+├── assets/         # Imagens e Fontes utilizadas 
+├── components/     # Componentes reutilizáveis
+├── navigation/     # Configuração de navegação
+   └── screens/     # Telas do aplicativo
+```
 
-- In the terminal running the development server, press `i` to open the iOS simulator, `a` to open the Android device or emulator, or `w` to open the web browser.
+## Recursos
 
-## Notes
-
-This project uses a [development build](https://docs.expo.dev/develop/development-builds/introduction/) and cannot be run with [Expo Go](https://expo.dev/go). To run the app with Expo Go, edit the `package.json` file, remove the `expo-dev-client` package and `--dev-client` flag from the `start` script.
-
-We highly recommend using the development builds for normal development and testing.
-
-The `ios` and `android` folder are gitignored in the project by default as they are automatically generated during the build process ([Continuous Native Generation](https://docs.expo.dev/workflow/continuous-native-generation/)). This means that you should not edit these folders directly and use [config plugins](https://docs.expo.dev/config-plugins/) instead. However, if you need to edit these folders, you can remove them from the `.gitignore` file so that they are tracked by git.
-
-## Resources
-
-- [React Navigation documentation](https://reactnavigation.org/)
-- [Expo documentation](https://docs.expo.dev/)
-
----
-
-Demo assets are from [lucide.dev](https://lucide.dev/)
+- [Documentação do React Navigation](https://reactnavigation.org/)
+- [Documentação do Expo](https://docs.expo.dev/)
+- [Documentação do React Native](https://reactnative.dev/)

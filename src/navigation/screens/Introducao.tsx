@@ -19,16 +19,15 @@ export function Introducao() {
             cães e gatos com facilidade.{'\n'}
             Qual o seu interesse?
           </Text>
+        <View style={styles.buttonContainer}>
+          <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar' })}>
+            Adotar
+          </SEButton>
+          
+          <SEButton onPress={() => navigation.navigate('CadastroAnimal')}>
+            Cadastrar Animal
+          </SEButton>
 
-          <View style={styles.buttonContainer}>
-            <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar' })}>
-              Adotar
-            </SEButton>
-            
-            <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar', params: { screen: 'CadastroAnimal' } })}>
-              Cadastrar Animal
-            </SEButton>
-          </View>
         </View>
 
         <View style={styles.loginContainer}>

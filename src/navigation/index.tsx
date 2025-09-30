@@ -1,4 +1,4 @@
-import { NavigatorScreenParams } from '@react-navigation/native';
+import { NavigationContainer, NavigatorScreenParams } from '@react-navigation/native';
 import {
   createStaticNavigation,
   StaticParamList,
@@ -7,6 +7,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { DrawerActions, useNavigation } from '@react-navigation/native';
 import { IconButton } from 'react-native-paper';
+import CustomDrawer from '../components/CustomDrawer';
 // Telas
 import { Introducao } from './screens/Introducao';
 import { Adotar } from './screens/Adotar';
@@ -83,9 +84,11 @@ function HomeStack() {
   );
 }
 
-function AppDrawer() {
+export function AppDrawer() {
   return (
-    <Drawer.Navigator>
+    <Drawer.Navigator
+      drawerContent={(props) => <CustomDrawer {...props} />}
+    >
       <Drawer.Screen 
         name="MeuPerfil" 
         component={MeuPerfil} 
@@ -177,6 +180,15 @@ function AppDrawer() {
         component={Privacidade} 
         options={{
           title: 'Política de Privacidade', 
+          headerStyle: { backgroundColor: '#88c9bf' },
+          headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '#434343' },
+        }}
+      />
+      <Drawer.Screen 
+        name="Cadastrar Animal" 
+        component={CadastroAnimal} 
+        options={{
+          title: 'Cadastrar Animal', 
           headerStyle: { backgroundColor: '#88c9bf' },
           headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '#434343' },
         }}
@@ -341,6 +353,7 @@ declare global {
       App: DrawerParamList;
       Introducao: undefined;
       CadastroPessoal: undefined;
+      CadastroAnimal: undefined;
       Login: undefined;
       FinalizarProcesso: undefined;
       NotFound: undefined;

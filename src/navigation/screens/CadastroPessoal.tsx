@@ -1,9 +1,11 @@
 import { Button } from '@react-navigation/elements';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView } from 'react-native';
 import { useState } from 'react';
-import { MaterialIcons } from '@expo/vector-icons';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from "../../config/firebase"
+import { doc, setDoc } from 'firebase/firestore'; 
+import { auth, db } from "../../config/firebase"; 
+
+import { MaterialIcons } from '@expo/vector-icons';
 import SEButton from '../../components/SEButton';
 import SETextInput from '../../components/SETextInput'; 
 export function CadastroPessoal() {
@@ -36,7 +38,23 @@ export function CadastroPessoal() {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
+        const userData = {
+        uid: user.uid, 
+        nome,
+        idade,
+        email,
+        estado,
+        cidade,
+        endereco,
+        telefone,
+        username,
+        createdAt: new Date(), 
+        };
+
+        await setDoc(doc(db, "usuários", user.uid), userData);
+
         alert("Cadastro Realizado com sucesso!")
+        
     } catch (error: any) {
         alert("Erro ao Cadastrar: " + error.message);
     }
@@ -177,7 +195,7 @@ export function CadastroPessoal() {
               style={styles.secondaryButton}
               screen="Login"
             >
-              <Text style={styles.secondaryButtonText}>Já tenho uma conta</Text>
+              Já tenho uma conta
             </Button>
           </View>
 
@@ -258,7 +276,7 @@ const styles = StyleSheet.create({
   },
   passwordInput: {
     flex: 1,
-    borderWidth: 0, // Remove a borda do SETextInput para não duplicar
+    borderWidth: 0,
   },
   eyeIcon: {
     padding: 12,
@@ -293,6 +311,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#88c9bf',
     marginTop: 8,
+    fontFamily: 'Roboto-Regular',
+    fontSize: 12,
+    color: '#88c9bf',
   },
   secondaryButtonText: {
     fontFamily: 'Roboto-Regular',
@@ -360,4 +381,3 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
-

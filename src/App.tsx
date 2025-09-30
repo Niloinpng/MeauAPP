@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import { Assets as NavigationAssets } from '@react-navigation/elements';
-import { DarkTheme, DefaultTheme } from '@react-navigation/native';
+import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { Asset } from 'expo-asset';
 import { useFonts } from 'expo-font';
 import { useEffect, useState } from 'react';
@@ -9,7 +9,8 @@ import { View, StyleSheet, Image } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import * as React from 'react';
 import { useColorScheme } from 'react-native';
-import { Navigation } from './navigation';
+import { AuthProvider } from './context/AuthContext';
+import  AppRoutes  from "./routes/AppRoutes";
 
 
 Asset.loadAsync([
@@ -64,16 +65,20 @@ export function App() {
   const theme = colorScheme === 'dark' ? DarkTheme : DefaultTheme
 
   return (
-    <Navigation
-      theme={theme}
-      linking={{
-        enabled: 'auto',
-        prefixes: [prefix],
-      }}
-      onReady={() => {
-        SplashScreen.hideAsync();
-      }}
-    />
+    <AuthProvider>
+        <NavigationContainer
+            theme={theme}
+            linking={{
+                enabled: 'auto',
+                prefixes: [prefix],
+            }}
+            onReady={() => {
+                SplashScreen.hideAsync();
+            }}
+        >
+            <AppRoutes />
+        </NavigationContainer>
+    </AuthProvider>
   );
 }
 
