@@ -6,6 +6,7 @@ import { AppDrawer, Navigation } from "../navigation/index";
 import { Introducao } from "../navigation/screens/Introducao";
 import { Login } from "../navigation/screens/Login";
 import { CadastroPessoal } from "../navigation/screens/CadastroPessoal";
+import { CadastroAnimal } from "../navigation/screens/CadastroAnimal";
 
 const Stack = createNativeStackNavigator();
 
@@ -36,6 +37,10 @@ export default function AppRoutes() {
           <Stack.Screen 
             name="CadastroPessoal" 
             component={CadastroPessoal} 
+            />
+            <Stack.Screen 
+            name="CadastroAnimal" 
+            component={CadastroAnimal} 
             />
         </>
       )}

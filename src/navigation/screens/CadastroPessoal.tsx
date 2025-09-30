@@ -1,7 +1,6 @@
 import { Button } from '@react-navigation/elements';
 import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView } from 'react-native';
 import { useState } from 'react';
-
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore'; 
 import { auth, db } from "../../config/firebase"; 
@@ -9,7 +8,6 @@ import { auth, db } from "../../config/firebase";
 import { MaterialIcons } from '@expo/vector-icons';
 import SEButton from '../../components/SEButton';
 import SETextInput from '../../components/SETextInput'; 
-
 export function CadastroPessoal() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');

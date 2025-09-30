@@ -84,7 +84,6 @@ function HomeStack() {
   );
 }
 
-
 export function AppDrawer() {
   return (
     <Drawer.Navigator
@@ -104,7 +103,9 @@ export function AppDrawer() {
         component={MeusPets} 
         options={{ 
           title: 'Meus Pets',
-          }}
+          headerStyle: { backgroundColor: '#88c9bf' },
+          headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '#434343' },
+        }}
       />
       <Drawer.Screen 
         name="Favoritos" 
@@ -112,7 +113,7 @@ export function AppDrawer() {
         options={{
           title: 'Favoritos', 
           headerStyle: { backgroundColor: '#88c9bf' },
-          headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '#434343' },
+          headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '##434343' },
         }}
       />
       <Drawer.Screen 
@@ -192,8 +193,6 @@ export function AppDrawer() {
           headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '#434343' },
         }}
       />
-
-
     </Drawer.Navigator>
   );
 }
@@ -205,31 +204,74 @@ const RootStack = createNativeStackNavigator({
       options: {
         headerShown: false,
       },
+      linking: {
+        path: '',
+      },
     },
     App: {
       screen: AppDrawer,
       options: {
         headerShown: false,
       },
+      linking: {
+        path: 'app', 
+        screens: {
+          Adotar: {
+            screens: {
+              AdotarHome: 'adotar', 
+              CadastroAnimal: 'cadastro-animal',
+            }
+          },
+          MeuPerfil: 'meu-perfil', 
+          MeusPets: 'meus-pets', 
+          Favoritos: 'favoritos',
+          Chat: 'chat',
+          Dicas: 'dicas',
+          Eventos: 'eventos',
+          Legislacao: 'legislacao',
+          Termo: 'termo',
+          Historias: 'historias',
+          Privacidade: 'privacidade',
+        }
+      },
     },
     Login: {
       screen: Login,
-    },    CadastroPessoal: {
-      screen: CadastroPessoal,
       options: {
-        title: 'Cadastro Pessoal', 
-        headerStyle: { backgroundColor: '#ffd358' },
+        title: 'Fazer Login', 
+        headerStyle: { backgroundColor: '#88c9bf' },
         headerTitleStyle: { 
           fontFamily: 'Roboto-Medium', 
           fontSize: 20, 
           color: '#434343' 
         },
         headerTintColor: '#434343',
-      }
+      },
+      linking: {
+        path: 'app/login',
+      },
     },
-
+    CadastroPessoal: {
+      screen: CadastroPessoal,
+      options: {
+        title: 'Cadastro Pessoal', 
+        headerStyle: { backgroundColor: '#88c9bf' },
+        headerTitleStyle: { 
+          fontFamily: 'Roboto-Medium', 
+          fontSize: 20, 
+          color: '#434343' 
+        },
+        headerTintColor: '#434343',
+      },
+      linking: {
+        path: 'app/cadastro-pessoal',
+      },
+    },
     FinalizarProcesso: {
       screen: FinalizarProcesso,
+      linking: {
+        path: 'app/finalizar-processo',
+      },
     },
     NotFound: {
       screen: NotFound,
@@ -243,13 +285,48 @@ const RootStack = createNativeStackNavigator({
   },
 });
 
-export const Navigation = createStaticNavigation(RootStack);
+const linking = {
+  prefixes: ['http://localhost:8081', 'myapp://'],
+  config: {
+    screens: {
+      Introducao: '',
+      Login: 'app/login',
+      CadastroPessoal: 'app/cadastro-pessoal',
+      App: {
+        path: 'app',
+        screens: {
+          Adotar: {
+            screens: {
+              AdotarHome: 'adotar',
+              CadastroAnimal: 'cadastro-animal',
+            }
+          },
+          MeuPerfil: 'meu-perfil',
+          MeusPets: 'meus-pets', 
+          Favoritos: 'favoritos',
+          Chat: 'chat', 
+          Dicas: 'dicas',
+          Eventos: 'eventos',
+          Legislacao: 'legislacao',
+          Termo: 'termo', 
+          Historias: 'historias', 
+          Privacidade: 'privacidade',
+        }
+      },
+      FinalizarProcesso: 'app/finalizar-processo',
+      NotFound: '*',
+    },
+  },
+};
+
+export const Navigation = createStaticNavigation(RootStack, {
+  linking,
+});
 
 type HomeStackParamList = {
   AdotarHome: undefined;
   CadastroAnimal: undefined;
   CadastroPessoal: undefined;
-
 };
 
 type DrawerParamList = {
@@ -276,6 +353,7 @@ declare global {
       App: DrawerParamList;
       Introducao: undefined;
       CadastroPessoal: undefined;
+      CadastroAnimal: undefined;
       Login: undefined;
       FinalizarProcesso: undefined;
       NotFound: undefined;
