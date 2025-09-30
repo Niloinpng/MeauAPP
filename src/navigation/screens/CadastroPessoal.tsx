@@ -1,10 +1,12 @@
 import { Button } from '@react-navigation/elements';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, Alert } from 'react-native';
 import { useState } from 'react';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore'; 
-import { auth, db } from "../../config/firebase"; 
-
+import { auth, db, storage } from "../../config/firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
 import { MaterialIcons } from '@expo/vector-icons';
 import SEButton from '../../components/SEButton';
 import SETextInput from '../../components/SETextInput'; 
@@ -22,23 +24,77 @@ export function CadastroPessoal() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
 
+  const [fotoPerfil, setFotoPerfil] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const handleAddPhoto = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (permissionResult.granted === false) {
+      Alert.alert("Atenção", "Você precisa permitir o acesso à galeria para adicionar uma foto!");
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true, 
+      aspect: [1, 1],     
+      quality: 1,          
+    });
+
+    if (!result.canceled) {
+      setFotoPerfil(result.assets[0].uri);
+    }
+  };
+
+const uploadImageAndGetURL = async (uri: string, userId: string): Promise<string> => {
+    try {
+      // 1. Comprimir e redimensionar a imagem
+      const manipulatedImage = await ImageManipulator.manipulateAsync(
+        uri,
+        [{ resize: { width: 400 } }], // Redimensiona para uma largura de 400px
+        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
+      );
+
+      // 2. Converter a imagem para Blob
+      const response = await fetch(manipulatedImage.uri);
+      const blob = await response.blob();
+      
+      // 3. Criar referência no Firebase Storage
+      const storageRef = ref(storage, `fotosDePerfil/${userId}/perfil.jpg`);
+
+      // 4. Fazer upload do Blob
+      await uploadBytes(storageRef, blob);
+
+      // 5. Obter a URL de download
+      const downloadURL = await getDownloadURL(storageRef);
+      return downloadURL;
+
+    } catch (error) {
+      console.error("Erro no upload da imagem: ", error);
+      throw new Error("Não foi possível fazer o upload da imagem de perfil.");
+    }
+  };
+
   const handleCadastro = async () => {
-    
-    if (!nome || !idade || !email || !estado || !cidade || !endereco || !telefone || !username || !password || !confirmPassword) {
-      alert('Por favor, preencha todos os campos');
+    if (!fotoPerfil || !nome || !idade || !email || !estado || !cidade || !endereco || !telefone || !username || !password || !confirmPassword) {
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos e adicione uma foto de perfil.');
       return;
     }
     
     if (password !== confirmPassword) {
-      alert('As senhas não coincidem');
+      Alert.alert('Atenção', 'As senhas não coincidem');
       return;
     }
 
-    try{
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+    setLoading(true); 
 
-        const userData = {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+
+      const fotoURL = await uploadImageAndGetURL(fotoPerfil, user.uid);
+
+      const userData = {
         uid: user.uid, 
         nome,
         idade,
@@ -48,23 +104,21 @@ export function CadastroPessoal() {
         endereco,
         telefone,
         username,
+        fotoURL: fotoURL, 
         createdAt: new Date(), 
-        };
+      };
 
-        await setDoc(doc(db, "usuários", user.uid), userData);
+      await setDoc(doc(db, "usuários", user.uid), userData);
 
-        alert("Cadastro Realizado com sucesso!")
-        
+      Alert.alert("Sucesso!", "Cadastro Realizado com sucesso!");
+      
     } catch (error: any) {
-        alert("Erro ao Cadastrar: " + error.message);
+      Alert.alert("Erro ao Cadastrar", error.message);
+    } finally {
+      setLoading(false); 
     }
-    
-
   };
 
-  const handleAddPhoto = () => {
-    console.log('Adicionar foto clicado');
-  };
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -179,8 +233,14 @@ export function CadastroPessoal() {
             
             <View style={styles.addPhotoContainer}>
               <TouchableOpacity style={styles.addPhotoButton} onPress={handleAddPhoto}>
-                <MaterialIcons name="control-point" size={32} color="#434343" />
-                <Text style={styles.addPhotoText}>Adicionar foto</Text>
+                {fotoPerfil ? (
+                  <Image source={{ uri: fotoPerfil }} style={styles.profileImage} />
+                ) : (
+                  <>
+                    <MaterialIcons name="control-point" size={32} color="#434343" />
+                    <Text style={styles.addPhotoText}>Adicionar foto</Text>
+                  </>
+                )}
               </TouchableOpacity>
             </View>
 
@@ -285,17 +345,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
-  addPhotoButton: {
-    width: 128,
-    height: 128,
-    backgroundColor: '#e6e7e7',
-    borderRadius: 4,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderStyle: 'dashed',
-  },
   addPhotoText: {
     fontFamily: 'Roboto-Regular',
     fontSize: 14,
@@ -379,5 +428,21 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#757575',
     fontWeight: '500',
+  },
+  addPhotoButton: {
+    width: 128,
+    height: 128,
+    backgroundColor: '#e6e7e7',
+    borderRadius: 4, 
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderStyle: 'dashed',
+    overflow: 'hidden', 
+  },
+  profileImage: {
+    width: '100%',
+    height: '100%',
   },
 });

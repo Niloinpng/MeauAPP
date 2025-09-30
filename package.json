@@ -38,7 +38,8 @@
     "react-native-web": "^0.21.0",
     "web-streams-polyfill": "^4.2.0",
     "react-native-reanimated": "~4.1.0",
-    "react-native-worklets": "0.5.1"
+    "react-native-worklets": "0.5.1",
+    "expo-image-manipulator": "~14.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
