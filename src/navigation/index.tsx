@@ -276,6 +276,7 @@ declare global {
       App: DrawerParamList;
       Introducao: undefined;
       CadastroPessoal: undefined;
+      CadastroAnimal: undefined;
       Login: undefined;
       FinalizarProcesso: undefined;
       NotFound: undefined;

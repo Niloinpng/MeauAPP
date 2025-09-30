@@ -22,7 +22,7 @@ export function Introducao() {
             Adotar
           </SEButton>
           
-          <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar', params: { screen: 'CadastroAnimal' } })}>
+          <SEButton onPress={() => navigation.navigate('CadastroAnimal')}>
             Cadastrar Animal
           </SEButton>
         </View>
