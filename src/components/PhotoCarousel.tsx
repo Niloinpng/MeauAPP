@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   carouselImage: {
     width: SCREEN_WIDTH,         
     height: 184,
-    resizeMode: 'cover',
+    resizeMode: 'contain',
   },
   dots: {
     position: 'absolute',
