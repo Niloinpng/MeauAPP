@@ -171,6 +171,9 @@ export function CadastroAnimal() {
         fotosUrls = await uploadImages(fotosAnimal, userId);
       }
 
+      const isDoente = selectedHealth.includes('Doente');
+      const statusDisponivel = !isDoente;
+
       const animalData = {
         nome: nome.trim(),
         especie: selectedEspecie,
@@ -187,6 +190,7 @@ export function CadastroAnimal() {
         dono: userId,
         fotos: fotosUrls,
         fotoPrincipal: fotosUrls[0] || null,
+        disponivel: statusDisponivel,
         metadata: {
           storageType: 'firebase_storage',
           imagesCount: fotosUrls.length,
@@ -197,7 +201,15 @@ export function CadastroAnimal() {
 
       await addDoc(collection(db, "animais"), animalData);
       
-      Alert.alert("Sucesso", "Animal cadastrado! Imagens comprimidas para 85% de qualidade.");
+      if (isDoente) {
+        Alert.alert(
+          "Cadastro Realizado!", 
+          "Seu animal por enquanto não está disponível para adoção porque está doente. Você pode alterar o status depois."
+        );
+      } else {
+        Alert.alert("Sucesso", "Animal cadastrado e disponível para adoção!");
+      }
+
       setIsSubmitted(true);
 
     } catch (error) {
@@ -221,6 +233,21 @@ export function CadastroAnimal() {
       setLoading(false);
     }
   };
+
+  const handleResetForm = () => {
+    setNome('');
+    setDoencas('');
+    setSobre('');
+    setSelectedAge(null);
+    setSelectedEspecie(null);
+    setSelectedSexo(null);
+    setSelectedPorte(null);
+    setSelectedPersonalities([]);
+    setSelectedHealth([]);
+    setSelectedExigencias([]);
+    setFotosAnimal([]);
+    setIsSubmitted(false);
+  };
   
   if (isSubmitted) {
     return (
@@ -236,10 +263,18 @@ export function CadastroAnimal() {
             privacidade do menu configurações do
             aplicativo.
           </Text>
+          <SEButton
+            onPress={handleResetForm} // Chama a função de reset
+            backgroundColor='#88C9BF'
+          >
+            Cadastrar Novo Animal
+          </SEButton>
         </View>
       </SafeAreaView>
     );
   }
+
+  const isDoenteSelecionado = selectedHealth.includes('Doente');
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -326,13 +361,15 @@ export function CadastroAnimal() {
           />
         </View>
         
-        <View style={styles.fieldGroup}>
-          <SETextInput
-            placeholder="Doenças do animal (opcional)"
-            value={doencas}
-            onChangeText={setDoencas}
-          />
-        </View>
+        {isDoenteSelecionado && (
+          <View style={styles.fieldGroup}>
+            <SETextInput
+              placeholder="Descreva as doenças do animal"
+              value={doencas}
+              onChangeText={setDoencas}
+            />
+          </View>
+        )}
 
         <View style={styles.fieldGroup}>
           <SETitle type="second" color="azul">EXIGÊNCIAS PARA ADOÇÃO</SETitle>
