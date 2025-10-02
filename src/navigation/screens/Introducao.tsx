@@ -19,42 +19,44 @@ export function Introducao() {
             cães e gatos com facilidade.{'\n'}
             Qual o seu interesse?
           </Text>
-        <View style={styles.buttonContainer}>
-          <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar' })}>
-            Adotar
-          </SEButton>
           
-          <SEButton onPress={() => navigation.navigate('CadastroAnimal')}>
-            Cadastrar Animal
-          </SEButton>
+          {/* CORREÇÃO: Fechamento correto do View principal */}
+          <View style={styles.buttonContainer}>
+            <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar' })}>
+              Adotar
+            </SEButton>
+            
+            <SEButton onPress={() => navigation.navigate('CadastroAnimal')}>
+              Cadastrar Animal
+            </SEButton>
+          </View>
 
-        </View>
+          <View style={styles.loginContainer}>
+            <Pressable 
+              onPress={() => navigation.navigate('Login')}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+              })}
+            >
+              <Text style={styles.loginText}>Login</Text>
+            </Pressable>
+            <Pressable 
+              onPress={() => navigation.navigate('CadastroPessoal')}
+              style={({ pressed }) => ({
+                opacity: pressed ? 0.5 : 1,
+                padding: 10,
+              })}
+            >
+              <Text style={styles.loginText}>Cadastre-se</Text>
+            </Pressable>
+          </View>
 
-        <View style={styles.loginContainer}>
-          <Pressable 
-            onPress={() => navigation.navigate('Login')}
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.5 : 1,
-            })}
-          >
-            <Text style={styles.loginText}>Login</Text>
-          </Pressable>
-          <Pressable 
-            onPress={() => navigation.navigate('CadastroPessoal')}
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.5 : 1,
-              padding: 10,
-            })}
-          >
-            <Text style={styles.loginText}>Cadastre-se </Text>
-          </Pressable>
-        </View>
-
-        <View style={styles.footer}>
-          <Image 
-            source={require('../../assets/images/Meau_marca_2.png')} 
-            style={styles.logoImage} 
-          />
+          <View style={styles.footer}>
+            <Image 
+              source={require('../../assets/images/Meau_marca_2.png')} 
+              style={styles.logoImage} 
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
