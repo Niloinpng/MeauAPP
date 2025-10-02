@@ -47,6 +47,7 @@ export function CadastroAnimal() {
   const [selectedHealth, setSelectedHealth] = useState<string[]>([]);
   const [selectedExigencias, setSelectedExigencias] = useState<string[]>([]);
   const [fotosAnimal, setFotosAnimal] = useState<string[]>([]);
+  const [localizacao, setLocalizacao] = useState('');
 
   const compressImage = async (uri: string, quality: number = 0.85): Promise<Blob> => {
     return new Promise(async (resolve, reject) => {
@@ -144,8 +145,8 @@ export function CadastroAnimal() {
 
   const handleFinalizar = async () => {
     
-    if (!nome.trim() || !selectedEspecie || !selectedSexo || !selectedPorte || !selectedAge) {
-      Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios (nome, espécie, sexo, porte e idade).");
+    if (!nome.trim() || !selectedEspecie || !selectedSexo || !selectedPorte || !selectedAge || !localizacao.trim()) {
+      Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios (nome, espécie, sexo, porte, idade e localização).");
       return;
     }
 
@@ -191,6 +192,7 @@ export function CadastroAnimal() {
         fotos: fotosUrls,
         fotoPrincipal: fotosUrls[0] || null,
         disponivel: statusDisponivel,
+        localizacao: localizacao.trim(),
         metadata: {
           storageType: 'firebase_storage',
           imagesCount: fotosUrls.length,
@@ -246,6 +248,7 @@ export function CadastroAnimal() {
     setSelectedHealth([]);
     setSelectedExigencias([]);
     setFotosAnimal([]);
+    setLocalizacao('');
     setIsSubmitted(false);
   };
   
@@ -389,11 +392,19 @@ export function CadastroAnimal() {
             multiline={true} 
           />
         </View>
+
+        <View style={styles.fieldGroup}>
+          <SETitle type="second" color="azul">LOCALIZAÇÃO</SETitle>
+          <SETextInput
+            placeholder="Cidade - Estado"
+            value={localizacao}
+            onChangeText={setLocalizacao}
+          />
+        </View>
         
         <SEButton 
           backgroundColor='#88C9BF' 
           onPress={handleFinalizar}
-          disabled={loading}
         >
           {loading ? 'CADASTRANDO...' : `COLOCAR PARA ${selectedType}`}
         </SEButton>
