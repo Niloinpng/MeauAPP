@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, FlatList, ActivityIndicator, Text } from 'react-native';
 import { PetCardUser } from '../../components/PetCardUser';
-import { Animal } from '../../types'; 
 import { getAuth} from 'firebase/auth'
 import { db } from '../../config/firebase'; 
 import { collection, query, where, getDocs } from 'firebase/firestore'; 
+import { Animal } from '../../types/index';
 
 export function MeusPets() {
   const [animais, setAnimais] = useState<Animal[]>([]);
@@ -37,6 +37,10 @@ export function MeusPets() {
 
     fetchAnimaisDisponiveis();
   }, []); 
+
+  useEffect(() => {
+    console.log(animais);
+  }, [animais]);
 
   if (loading) {
     return (

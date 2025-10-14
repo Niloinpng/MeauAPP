@@ -31,14 +31,16 @@ export default function CustomDrawer(props: DrawerContentComponentProps) {
   const fetchUserData = async () => {
     const user = auth.currentUser;
     if (user) {
+      // Cria uma referência ao documento do usuário na coleção 'usuários'
       const userDocRef = doc(db, "usuários", user.uid);
       try {
         const docSnap = await getDoc(userDocRef);
         if (docSnap.exists()) {
+          // Se o documento existir, pega o campo 'nome' e atualiza o estado
           setUserName(docSnap.data().nome);
         } else {
           console.log("Documento do usuário não encontrado no Firestore!");
-          setUserName("Usuário");
+          setUserName("Usuário"); // Um nome padrão
         }
       } catch (error) {
         console.error("Erro ao buscar dados do usuário:", error);

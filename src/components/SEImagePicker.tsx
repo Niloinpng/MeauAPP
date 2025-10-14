@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ViewStyle,
   Image,
   ScrollView,
+  Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import * as ImagePicker from 'expo-image-picker';
@@ -26,31 +27,105 @@ const SEImagePicker: React.FC<SEImagePickerProps> = ({
   style,
   maxImages = 5,
 }) => {
-  const handleSelectImages = async () => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const requestPermissions = async () => {
+    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+    const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (cameraStatus !== 'granted' || libraryStatus !== 'granted') {
+      Alert.alert(
+        'Permissão necessária',
+        'Precisamos da permissão da câmera e galeria para adicionar fotos.'
+      );
+      return false;
+    }
+    return true;
+  };
+
+  const takePhoto = async () => {
+    if (imageUris.length >= maxImages) {
+      Alert.alert("Limite atingido", `Você só pode adicionar até ${maxImages} fotos.`);
+      setModalVisible(false);
+      return;
+    }
+
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      setModalVisible(false);
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0].uri) {
+        addImage(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível abrir a câmera.');
+    }
+    setModalVisible(false);
+  };
+
+  const pickFromGallery = async () => {
+    if (imageUris.length >= maxImages) {
+      Alert.alert("Limite atingido", `Você só pode adicionar até ${maxImages} fotos.`);
+      setModalVisible(false);
+      return;
+    }
+
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      setModalVisible(false);
+      return;
+    }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+        allowsMultipleSelection: true,
+        selectionLimit: maxImages - imageUris.length,
+      });
+
+      if (!result.canceled && result.assets) {
+        const newUris = result.assets.map(asset => asset.uri);
+        addImages(newUris);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível acessar a galeria.');
+    }
+    setModalVisible(false);
+  };
+
+  const addImage = (uri: string) => {
     if (imageUris.length >= maxImages) {
       Alert.alert("Limite atingido", `Você só pode adicionar até ${maxImages} fotos.`);
       return;
     }
+    onImagesChange([...imageUris, uri]);
+  };
 
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      Alert.alert("Permissão necessária", "Você precisa permitir o acesso à galeria para adicionar fotos.");
+  const addImages = (uris: string[]) => {
+    const availableSlots = maxImages - imageUris.length;
+    if (availableSlots <= 0) {
+      Alert.alert("Limite atingido", `Você só pode adicionar até ${maxImages} fotos.`);
       return;
     }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 1,
-      allowsMultipleSelection: true,
-      selectionLimit: maxImages - imageUris.length,
-    });
-
-    if (!result.canceled && result.assets) {
-      const newUris = result.assets.map(asset => asset.uri);
-      onImagesChange([...imageUris, ...newUris]);
+    
+    const urisToAdd = uris.slice(0, availableSlots);
+    onImagesChange([...imageUris, ...urisToAdd]);
+    
+    if (uris.length > availableSlots) {
+      Alert.alert('Algumas fotos não foram adicionadas', `Limite de ${maxImages} fotos atingido.`);
     }
   };
 
@@ -77,6 +152,14 @@ const SEImagePicker: React.FC<SEImagePickerProps> = ({
     );
   };
 
+  const showImagePickerOptions = () => {
+    if (imageUris.length >= maxImages) {
+      Alert.alert("Limite atingido", `Você já adicionou o máximo de ${maxImages} fotos.`);
+      return;
+    }
+    setModalVisible(true);
+  };
+
   return (
     <View style={[styles.container, style]}>
       {/* Header com contador e botão de remover todas */}
@@ -99,7 +182,7 @@ const SEImagePicker: React.FC<SEImagePickerProps> = ({
             styles.placeholderContainer,
             imageUris.length > 0 && styles.placeholderWithImages
           ]}
-          onPress={handleSelectImages}
+          onPress={showImagePickerOptions}
         >
           <Icon 
             name="control-point" 
@@ -148,6 +231,42 @@ const SEImagePicker: React.FC<SEImagePickerProps> = ({
           Toque para adicionar fotos do animal
         </Text>
       )}
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Escolher fonte da foto</Text>
+            
+            <TouchableOpacity 
+              style={styles.modalOption}
+              onPress={takePhoto}
+            >
+              <Icon name="camera-alt" size={24} color="#434343" />
+              <Text style={styles.modalOptionText}>Tirar foto</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.modalOption}
+              onPress={pickFromGallery}
+            >
+              <Icon name="photo-library" size={24} color="#434343" />
+              <Text style={styles.modalOptionText}>Escolher da galeria</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.modalOption, styles.cancelOption]}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.cancelOptionText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -259,6 +378,52 @@ const styles = StyleSheet.create({
     color: '#bdbdbd',
     textAlign: 'center',
     marginTop: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 20,
+    paddingBottom: 32,
+  },
+  modalTitle: {
+    fontFamily: 'Roboto-Medium',
+    fontSize: 18,
+    color: '#434343',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    gap: 16,
+  },
+  modalOptionText: {
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    color: '#434343',
+  },
+  cancelOption: {
+    justifyContent: 'center',
+    borderBottomWidth: 0,
+    marginTop: 8,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+  },
+  cancelOptionText: {
+    fontFamily: 'Roboto-Medium',
+    fontSize: 16,
+    color: '#FF6B6B',
+    textAlign: 'center',
   },
 });
 

@@ -47,7 +47,6 @@ export function CadastroAnimal() {
   const [selectedHealth, setSelectedHealth] = useState<string[]>([]);
   const [selectedExigencias, setSelectedExigencias] = useState<string[]>([]);
   const [fotosAnimal, setFotosAnimal] = useState<string[]>([]);
-  const [localizacao, setLocalizacao] = useState('');
 
   const compressImage = async (uri: string, quality: number = 0.85): Promise<Blob> => {
     return new Promise(async (resolve, reject) => {
@@ -145,8 +144,8 @@ export function CadastroAnimal() {
 
   const handleFinalizar = async () => {
     
-    if (!nome.trim() || !selectedEspecie || !selectedSexo || !selectedPorte || !selectedAge || !localizacao.trim()) {
-      Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios (nome, espécie, sexo, porte, idade e localização).");
+    if (!nome.trim() || !selectedEspecie || !selectedSexo || !selectedPorte || !selectedAge) {
+      Alert.alert("Atenção", "Por favor, preencha todos os campos obrigatórios (nome, espécie, sexo, porte e idade).");
       return;
     }
 
@@ -172,9 +171,6 @@ export function CadastroAnimal() {
         fotosUrls = await uploadImages(fotosAnimal, userId);
       }
 
-      const isDoente = selectedHealth.includes('Doente');
-      const statusDisponivel = !isDoente;
-
       const animalData = {
         nome: nome.trim(),
         especie: selectedEspecie,
@@ -191,8 +187,6 @@ export function CadastroAnimal() {
         dono: userId,
         fotos: fotosUrls,
         fotoPrincipal: fotosUrls[0] || null,
-        disponivel: statusDisponivel,
-        localizacao: localizacao.trim(),
         metadata: {
           storageType: 'firebase_storage',
           imagesCount: fotosUrls.length,
@@ -203,15 +197,7 @@ export function CadastroAnimal() {
 
       await addDoc(collection(db, "animais"), animalData);
       
-      if (isDoente) {
-        Alert.alert(
-          "Cadastro Realizado!", 
-          "Seu animal por enquanto não está disponível para adoção porque está doente. Você pode alterar o status depois."
-        );
-      } else {
-        Alert.alert("Sucesso", "Animal cadastrado e disponível para adoção!");
-      }
-
+      Alert.alert("Sucesso", "Animal cadastrado! Imagens comprimidas para 85% de qualidade.");
       setIsSubmitted(true);
 
     } catch (error) {
@@ -235,22 +221,6 @@ export function CadastroAnimal() {
       setLoading(false);
     }
   };
-
-  const handleResetForm = () => {
-    setNome('');
-    setDoencas('');
-    setSobre('');
-    setSelectedAge(null);
-    setSelectedEspecie(null);
-    setSelectedSexo(null);
-    setSelectedPorte(null);
-    setSelectedPersonalities([]);
-    setSelectedHealth([]);
-    setSelectedExigencias([]);
-    setFotosAnimal([]);
-    setLocalizacao('');
-    setIsSubmitted(false);
-  };
   
   if (isSubmitted) {
     return (
@@ -266,18 +236,10 @@ export function CadastroAnimal() {
             privacidade do menu configurações do
             aplicativo.
           </Text>
-          <SEButton
-            onPress={handleResetForm} // Chama a função de reset
-            backgroundColor='#88C9BF'
-          >
-            Cadastrar Novo Animal
-          </SEButton>
         </View>
       </SafeAreaView>
     );
   }
-
-  const isDoenteSelecionado = selectedHealth.includes('Doente');
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -364,15 +326,13 @@ export function CadastroAnimal() {
           />
         </View>
         
-        {isDoenteSelecionado && (
-          <View style={styles.fieldGroup}>
-            <SETextInput
-              placeholder="Descreva as doenças do animal"
-              value={doencas}
-              onChangeText={setDoencas}
-            />
-          </View>
-        )}
+        <View style={styles.fieldGroup}>
+          <SETextInput
+            placeholder="Doenças do animal (opcional)"
+            value={doencas}
+            onChangeText={setDoencas}
+          />
+        </View>
 
         <View style={styles.fieldGroup}>
           <SETitle type="second" color="azul">EXIGÊNCIAS PARA ADOÇÃO</SETitle>
@@ -392,19 +352,11 @@ export function CadastroAnimal() {
             multiline={true} 
           />
         </View>
-
-        <View style={styles.fieldGroup}>
-          <SETitle type="second" color="azul">LOCALIZAÇÃO</SETitle>
-          <SETextInput
-            placeholder="Cidade - Estado"
-            value={localizacao}
-            onChangeText={setLocalizacao}
-          />
-        </View>
         
         <SEButton 
           backgroundColor='#88C9BF' 
           onPress={handleFinalizar}
+          disabled={loading}
         >
           {loading ? 'CADASTRANDO...' : `COLOCAR PARA ${selectedType}`}
         </SEButton>

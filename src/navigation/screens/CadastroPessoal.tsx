@@ -1,15 +1,15 @@
 import { Button } from '@react-navigation/elements';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, Modal, Alert } from 'react-native';
 import { useState } from 'react';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore'; 
-import { auth, db, storage } from "../../config/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import * as ImagePicker from 'expo-image-picker';
-import * as ImageManipulator from 'expo-image-manipulator';
 import { MaterialIcons } from '@expo/vector-icons';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth, db, storage } from "../../config/firebase";
+import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import * as ImagePicker from 'expo-image-picker';
 import SEButton from '../../components/SEButton';
 import SETextInput from '../../components/SETextInput'; 
+
 export function CadastroPessoal() {
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
@@ -23,102 +23,253 @@ export function CadastroPessoal() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
-
   const [fotoPerfil, setFotoPerfil] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleAddPhoto = async () => {
-    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (permissionResult.granted === false) {
-      Alert.alert("Atenção", "Você precisa permitir o acesso à galeria para adicionar uma foto!");
+  const compressImage = async (uri: string, quality: number = 0.85): Promise<Blob> => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await fetch(uri);
+        const originalBlob = await response.blob();
+
+        if (typeof document !== 'undefined') {
+          const img = new Image();
+          img.onload = () => {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d')!;
+
+            const MAX_WIDTH = 800;
+            const MAX_HEIGHT = 800;
+            let { width, height } = img;
+
+            if (width > height) {
+              if (width > MAX_WIDTH) {
+                height *= MAX_WIDTH / width;
+                width = MAX_WIDTH;
+              }
+            } else {
+              if (height > MAX_HEIGHT) {
+                width *= MAX_HEIGHT / height;
+                height = MAX_HEIGHT;
+              }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(
+              (compressedBlob) => {
+                if (compressedBlob) {
+                  resolve(compressedBlob);
+                } else {
+                  reject(new Error('Falha na compressão'));
+                }
+              },
+              'image/jpeg',
+              quality
+            );
+          };
+
+          img.onerror = reject;
+          img.src = URL.createObjectURL(originalBlob);
+        } else {
+          resolve(originalBlob);
+        }
+      } catch (error) {
+        reject(error);
+      }
+    });
+  };
+
+  const uploadProfileImage = async (imageUri: string, userId: string): Promise<string> => {
+    try {
+      const compressedBlob = await compressImage(imageUri, 0.85);
+      
+      const imageName = `perfis/${userId}/foto_perfil_${Date.now()}.jpg`;
+      const storageRef = ref(storage, imageName);
+
+      const metadata = {
+        contentType: 'image/jpeg',
+        customMetadata: {
+          'uploadedBy': userId,
+          'uploadTime': new Date().toISOString(),
+          'compressionQuality': '85%',
+          'type': 'profile_picture'
+        }
+      };
+
+      const snapshot = await uploadBytes(storageRef, compressedBlob, metadata);
+      const downloadURL = await getDownloadURL(snapshot.ref);
+      
+      return downloadURL;
+    } catch (error) {
+      throw new Error(`Falha no upload da foto de perfil: ${error}`);
+    }
+  };
+
+  const requestPermissions = async () => {
+    const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
+    const { status: libraryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    
+    if (cameraStatus !== 'granted' || libraryStatus !== 'granted') {
+      Alert.alert('Permissão necessária', 'Precisamos da permissão da câmera e galeria para adicionar fotos.');
+      return false;
+    }
+    return true;
+  };
+
+  const takePhoto = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      setModalVisible(false);
       return;
     }
 
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true, 
-      aspect: [1, 1],     
-      quality: 1,          
-    });
+    try {
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
 
-    if (!result.canceled) {
-      setFotoPerfil(result.assets[0].uri);
+      if (!result.canceled && result.assets && result.assets[0].uri) {
+        setFotoPerfil(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível abrir a câmera.');
     }
+    setModalVisible(false);
   };
 
-const uploadImageAndGetURL = async (uri: string, userId: string): Promise<string> => {
-    try {
-      // 1. Comprimir e redimensionar a imagem
-      const manipulatedImage = await ImageManipulator.manipulateAsync(
-        uri,
-        [{ resize: { width: 400 } }], // Redimensiona para uma largura de 400px
-        { compress: 0.8, format: ImageManipulator.SaveFormat.JPEG }
-      );
-
-      // 2. Converter a imagem para Blob
-      const response = await fetch(manipulatedImage.uri);
-      const blob = await response.blob();
-      
-      // 3. Criar referência no Firebase Storage
-      const storageRef = ref(storage, `fotosDePerfil/${userId}/perfil.jpg`);
-
-      // 4. Fazer upload do Blob
-      await uploadBytes(storageRef, blob);
-
-      // 5. Obter a URL de download
-      const downloadURL = await getDownloadURL(storageRef);
-      return downloadURL;
-
-    } catch (error) {
-      console.error("Erro no upload da imagem: ", error);
-      throw new Error("Não foi possível fazer o upload da imagem de perfil.");
+  const pickFromGallery = async () => {
+    const hasPermission = await requestPermissions();
+    if (!hasPermission) {
+      setModalVisible(false);
+      return;
     }
+
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets && result.assets[0].uri) {
+        setFotoPerfil(result.assets[0].uri);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível acessar a galeria.');
+    }
+    setModalVisible(false);
+  };
+
+  const handleAddPhoto = () => {
+    setModalVisible(true);
+  };
+
+  const handleRemovePhoto = () => {
+    setFotoPerfil(null);
   };
 
   const handleCadastro = async () => {
-    if (!fotoPerfil || !nome || !idade || !email || !estado || !cidade || !endereco || !telefone || !username || !password || !confirmPassword) {
-      Alert.alert('Atenção', 'Por favor, preencha todos os campos e adicione uma foto de perfil.');
+    if (!nome || !idade || !email || !estado || !cidade || !endereco || !telefone || !username || !password || !confirmPassword) {
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos obrigatórios.');
       return;
     }
     
     if (password !== confirmPassword) {
-      Alert.alert('Atenção', 'As senhas não coincidem');
+      Alert.alert('Atenção', 'As senhas não coincidem.');
       return;
     }
 
-    setLoading(true); 
+    if (password.length < 6) {
+      Alert.alert('Atenção', 'A senha deve ter pelo menos 6 caracteres.');
+      return;
+    }
+
+    setLoading(true);
 
     try {
+      // Criar usuário no Authentication
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+      const userId = user.uid;
 
-      const fotoURL = await uploadImageAndGetURL(fotoPerfil, user.uid);
+      let fotoPerfilUrl = null;
 
+      // Upload da foto de perfil se existir
+      if (fotoPerfil) {
+        Alert.alert("Aguarde", "Fazendo upload da foto de perfil...");
+        fotoPerfilUrl = await uploadProfileImage(fotoPerfil, userId);
+      }
+
+      // Salvar dados adicionais no Firestore
       const userData = {
-        uid: user.uid, 
-        nome,
-        idade,
-        email,
-        estado,
-        cidade,
-        endereco,
-        telefone,
-        username,
-        fotoURL: fotoURL, 
-        createdAt: new Date(), 
+        nome: nome.trim(),
+        email: email.trim(),
+        idade: idade.trim(),
+        estado: estado.trim(),
+        cidade: cidade.trim(),
+        endereco: endereco.trim(),
+        telefone: telefone.trim(),
+        username: username.trim(),
+        fotoPerfil: fotoPerfilUrl,
+        dataCadastro: new Date(),
+        ultimaAtualizacao: new Date(),
+        tipoUsuario: 'pessoal',
+        metadata: {
+          storageType: 'firebase_storage',
+          hasProfilePicture: !!fotoPerfilUrl,
+          compression: fotoPerfilUrl ? '85%_quality' : 'none',
+          timestamp: new Date().toISOString()
+        }
       };
 
-      await setDoc(doc(db, "usuários", user.uid), userData);
+      // Salvar no Firestore na coleção 'usuarios'
+      await setDoc(doc(db, "usuarios", userId), userData);
 
-      Alert.alert("Sucesso!", "Cadastro Realizado com sucesso!");
-      
+      Alert.alert(
+        "Sucesso!", 
+        "Cadastro realizado com sucesso! Sua conta foi criada e seus dados foram salvos."
+      );
+
+      // Limpar formulário após sucesso
+      setNome('');
+      setEmail('');
+      setIdade('');
+      setEstado('');
+      setCidade('');
+      setEndereco('');
+      setTelefone('');
+      setUsername('');
+      setPassword('');
+      setConfirmPassword('');
+      setFotoPerfil(null);
+
     } catch (error: any) {
-      Alert.alert("Erro ao Cadastrar", error.message);
+      let errorMessage = "Ocorreu um erro ao tentar cadastrar. Tente novamente.";
+      
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "Este email já está em uso. Tente fazer login ou use outro email.";
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = "O email informado não é válido.";
+      } else if (error.code === 'auth/weak-password') {
+        errorMessage = "A senha é muito fraca. Use pelo menos 6 caracteres.";
+      } else if (error.message.includes('upload')) {
+        errorMessage = "Erro ao fazer upload da foto de perfil. Você pode tentar novamente mais tarde.";
+      }
+      
+      Alert.alert("Erro", errorMessage);
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
-
 
   return (
     <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -145,14 +296,15 @@ const uploadImageAndGetURL = async (uri: string, userId: string): Promise<string
               placeholder="Idade"
               value={idade}
               onChangeText={setIdade}
-              type="numeric"
+              keyboardType="numeric"
             />
           
             <SETextInput
               placeholder="E-mail"
               value={email}
               onChangeText={setEmail}
-              type="email"
+              keyboardType="email-address"
+              autoCapitalize="none"
             />
             
             <SETextInput
@@ -194,7 +346,6 @@ const uploadImageAndGetURL = async (uri: string, userId: string): Promise<string
               autoCapitalize="none"
             />
             
-            {/* Mantive os inputs de senha originais pois o SETextInput não tem ícone de olho integrado */}
             <View style={styles.passwordContainer}>
               <SETextInput
                 placeholder="Senha"
@@ -207,7 +358,11 @@ const uploadImageAndGetURL = async (uri: string, userId: string): Promise<string
                 style={styles.eyeIcon}
                 onPress={() => setIsPasswordVisible(!isPasswordVisible)}
               >
-                <Text>{isPasswordVisible ? '👁️' : '🔒'}</Text>
+                <MaterialIcons 
+                  name={isPasswordVisible ? "visibility" : "visibility-off"} 
+                  size={20} 
+                  color="#757575" 
+                />
               </TouchableOpacity>
             </View>
             
@@ -223,7 +378,11 @@ const uploadImageAndGetURL = async (uri: string, userId: string): Promise<string
                 style={styles.eyeIcon}
                 onPress={() => setIsConfirmPasswordVisible(!isConfirmPasswordVisible)}
               >
-                <Text>{isConfirmPasswordVisible ? '👁️' : '🔒'}</Text>
+                <MaterialIcons 
+                  name={isConfirmPasswordVisible ? "visibility" : "visibility-off"} 
+                  size={20} 
+                  color="#757575" 
+                />
               </TouchableOpacity>
             </View>
             
@@ -232,30 +391,34 @@ const uploadImageAndGetURL = async (uri: string, userId: string): Promise<string
             </View>
             
             <View style={styles.addPhotoContainer}>
-              <TouchableOpacity style={styles.addPhotoButton} onPress={handleAddPhoto}>
-                {fotoPerfil ? (
-                  <Image source={{ uri: fotoPerfil }} style={styles.profileImage} />
-                ) : (
-                  <>
-                    <MaterialIcons name="control-point" size={32} color="#434343" />
-                    <Text style={styles.addPhotoText}>Adicionar foto</Text>
-                  </>
-                )}
-              </TouchableOpacity>
+              {fotoPerfil ? (
+                <View style={styles.photoContainer}>
+                  <Image source={{ uri: fotoPerfil }} style={styles.photoImage} />
+                  <TouchableOpacity style={styles.removePhotoButton} onPress={handleRemovePhoto}>
+                    <MaterialIcons name="close" size={20} color="#fff" />
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                <TouchableOpacity style={styles.addPhotoButton} onPress={handleAddPhoto}>
+                  <MaterialIcons name="control-point" size={32} color="#434343" />
+                  <Text style={styles.addPhotoText}>Adicionar foto</Text>
+                </TouchableOpacity>
+              )}
             </View>
 
             <SEButton 
               backgroundColor='#88C9BF' 
               onPress={handleCadastro}
+              disabled={loading}
             >
-              Fazer Cadastro
+              {loading ? 'CADASTRANDO...' : 'Fazer Cadastro'}
             </SEButton>
             
             <Button 
               style={styles.secondaryButton}
               screen="Login"
             >
-              Já tenho uma conta
+              <Text style={styles.secondaryButtonText}>Já tenho uma conta</Text>
             </Button>
           </View>
 
@@ -282,6 +445,42 @@ const uploadImageAndGetURL = async (uri: string, userId: string): Promise<string
           </TouchableOpacity>
         </View>
       </View>
+
+      <Modal
+        visible={modalVisible}
+        transparent={true}
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Escolher fonte da foto</Text>
+            
+            <TouchableOpacity 
+              style={styles.modalOption}
+              onPress={takePhoto}
+            >
+              <MaterialIcons name="camera-alt" size={24} color="#434343" />
+              <Text style={styles.modalOptionText}>Tirar foto</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.modalOption}
+              onPress={pickFromGallery}
+            >
+              <MaterialIcons name="photo-library" size={24} color="#434343" />
+              <Text style={styles.modalOptionText}>Escolher da galeria</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.modalOption, styles.cancelOption]}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.cancelOptionText}>Cancelar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
@@ -345,6 +544,40 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 16,
   },
+  addPhotoButton: {
+    width: 128,
+    height: 128,
+    backgroundColor: '#e6e7e7',
+    borderRadius: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderStyle: 'dashed',
+  },
+  photoContainer: {
+    position: 'relative',
+    width: 128,
+    height: 128,
+  },
+  photoImage: {
+    width: 128,
+    height: 128,
+    borderRadius: 4,
+  },
+  removePhotoButton: {
+    position: 'absolute',
+    top: -8,
+    right: -8,
+    backgroundColor: '#FF6B6B',
+    borderRadius: 12,
+    width: 24,
+    height: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+  },
   addPhotoText: {
     fontFamily: 'Roboto-Regular',
     fontSize: 14,
@@ -360,9 +593,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#88c9bf',
     marginTop: 8,
-    fontFamily: 'Roboto-Regular',
-    fontSize: 12,
-    color: '#88c9bf',
   },
   secondaryButtonText: {
     fontFamily: 'Roboto-Regular',
@@ -429,20 +659,50 @@ const styles = StyleSheet.create({
     color: '#757575',
     fontWeight: '500',
   },
-  addPhotoButton: {
-    width: 128,
-    height: 128,
-    backgroundColor: '#e6e7e7',
-    borderRadius: 4, 
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e0e0e0',
-    borderStyle: 'dashed',
-    overflow: 'hidden', 
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
   },
-  profileImage: {
-    width: '100%',
-    height: '100%',
+  modalContainer: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 20,
+    paddingBottom: 32,
+  },
+  modalTitle: {
+    fontFamily: 'Roboto-Medium',
+    fontSize: 18,
+    color: '#434343',
+    textAlign: 'center',
+    marginBottom: 20,
+  },
+  modalOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0f0f0',
+    gap: 16,
+  },
+  modalOptionText: {
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    color: '#434343',
+  },
+  cancelOption: {
+    justifyContent: 'center',
+    borderBottomWidth: 0,
+    marginTop: 8,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 8,
+  },
+  cancelOptionText: {
+    fontFamily: 'Roboto-Medium',
+    fontSize: 16,
+    color: '#FF6B6B',
+    textAlign: 'center',
   },
 });
