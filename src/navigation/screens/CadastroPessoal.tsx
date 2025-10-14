@@ -1,16 +1,20 @@
 import { Button } from '@react-navigation/elements';
-import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, Modal, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, SafeAreaView, Image, ScrollView, Alert } from 'react-native';
 import { useState } from 'react';
-import { MaterialIcons } from '@expo/vector-icons';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth, db, storage } from "../../config/firebase";
-import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import * as ImagePicker from 'expo-image-picker';
+import * as ImageManipulator from 'expo-image-manipulator';
+import { MaterialIcons } from '@expo/vector-icons';
+import { collection, addDoc, doc, setDoc } from 'firebase/firestore';
 import SEButton from '../../components/SEButton';
 import SETextInput from '../../components/SETextInput'; 
+import { Modal } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Don't forget to import navigation
 
 export function CadastroPessoal() {
+  const navigation = useNavigation();
   const [nome, setNome] = useState('');
   const [email, setEmail] = useState('');
   const [idade, setIdade] = useState('');
@@ -169,17 +173,19 @@ export function CadastroPessoal() {
     setModalVisible(false);
   };
 
-  const handleAddPhoto = () => {
-    setModalVisible(true);
-  };
-
   const handleRemovePhoto = () => {
     setFotoPerfil(null);
   };
 
+  const handleAddPhoto = () => {
+    setModalVisible(true);
+  };
+
   const handleCadastro = async () => {
-    if (!nome || !idade || !email || !estado || !cidade || !endereco || !telefone || !username || !password || !confirmPassword) {
-      Alert.alert('Atenção', 'Por favor, preencha todos os campos obrigatórios.');
+    if (loading) return;
+
+    if (!fotoPerfil || !nome || !idade || !email || !estado || !cidade || !endereco || !telefone || !username || !password || !confirmPassword) {
+      Alert.alert('Atenção', 'Por favor, preencha todos os campos e adicione uma foto de perfil.');
       return;
     }
     
@@ -272,8 +278,8 @@ export function CadastroPessoal() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.content}>
           <View style={styles.formContainer}>
             
@@ -404,47 +410,46 @@ export function CadastroPessoal() {
                   <Text style={styles.addPhotoText}>Adicionar foto</Text>
                 </TouchableOpacity>
               )}
-            </View>
-
+            </View> {/* FIXED: Missing closing tag for addPhotoContainer */}
+            
             <SEButton 
               backgroundColor='#88C9BF' 
               onPress={handleCadastro}
-              disabled={loading}
             >
               {loading ? 'CADASTRANDO...' : 'Fazer Cadastro'}
             </SEButton>
             
-            <Button 
+            <TouchableOpacity 
               style={styles.secondaryButton}
-              screen="Login"
+              onPress={() => navigation.navigate('Login')}
             >
               <Text style={styles.secondaryButtonText}>Já tenho uma conta</Text>
-            </Button>
-          </View>
+            </TouchableOpacity>
+              
+            <Text style={styles.divider}>Ou cadastre-se com</Text>
 
-          <Text style={styles.divider}>Ou cadastre-se com</Text>
+            <TouchableOpacity style={styles.facebookButton} onPress={() => console.log('Facebook cadastro')}>
+              <View style={styles.socialButtonContent}>
+                <Image 
+                  source={require('../../assets/images/facebook-icon.png')}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.facebookButtonText}>Cadastrar com Facebook</Text>
+              </View>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.facebookButton} onPress={() => console.log('Facebook cadastro')}>
-            <View style={styles.socialButtonContent}>
-              <Image 
-                source={require('../../assets/images/facebook-icon.png')}
-                style={styles.socialIcon}
-              />
-              <Text style={styles.facebookButtonText}>Cadastrar com Facebook</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.googleButton} onPress={() => console.log('Google cadastro')}>
-            <View style={styles.socialButtonContent}>
-              <Image 
-                source={require('../../assets/images/google-icon.png')}
-                style={styles.socialIcon}
-              />
-              <Text style={styles.googleButtonText}>Cadastrar com Google</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-      </View>
+            <TouchableOpacity style={styles.googleButton} onPress={() => console.log('Google cadastro')}>
+              <View style={styles.socialButtonContent}>
+                <Image 
+                  source={require('../../assets/images/google-icon.png')}
+                  style={styles.socialIcon}
+                />
+                <Text style={styles.googleButtonText}>Cadastrar com Google</Text>
+              </View>
+            </TouchableOpacity>
+          </View> {/* FIXED: Missing closing tag for formContainer */}
+        </View> {/* FIXED: Missing closing tag for content */}
+      </ScrollView>
 
       <Modal
         visible={modalVisible}
@@ -481,7 +486,7 @@ export function CadastroPessoal() {
           </View>
         </View>
       </Modal>
-    </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -492,13 +497,13 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fafafa',
-    padding: 16,
   },
   content: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 20,
+    paddingHorizontal: 16,
   },
   formContainer: {
     width: '100%',

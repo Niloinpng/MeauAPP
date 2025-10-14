@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, Pressable, SafeAreaView, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, SafeAreaView, Image } from 'react-native';
 import SEButton from '../../components/SEButton';
 import { useNavigation } from '@react-navigation/native'; 
 
@@ -7,58 +7,47 @@ export function Introducao() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView 
-        contentContainerStyle={styles.scrollContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={styles.mainContent}>
-          <Text style={styles.title}>Olá!</Text>
-          <Text style={styles.subtitle}>
-            Bem vindo ao Meau!{'\n'}
-            Aqui você pode adotar, doar e ajudar{'\n'}
-            cães e gatos com facilidade.{'\n'}
-            Qual o seu interesse?
-          </Text>
+      {/* Conteúdo principal */}
+      <View style={styles.mainContent}>
+        <Text style={styles.title}>Olá!</Text>
+        <Text style={styles.subtitle}>
+          Bem vindo ao Meau!{'\n'}
+          Aqui você pode adotar, doar e ajudar{'\n'}
+          cães e gatos com facilidade.{'\n'}
+          Qual o seu interesse?
+        </Text>
+
+        <View style={styles.buttonContainer}>
+          <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar' })}>
+            Adotar
+          </SEButton>
           
-          {/* CORREÇÃO: Fechamento correto do View principal */}
-          <View style={styles.buttonContainer}>
-            <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar' })}>
-              Adotar
-            </SEButton>
-            
-            <SEButton onPress={() => navigation.navigate('CadastroAnimal')}>
-              Cadastrar Animal
-            </SEButton>
-          </View>
-
-          <View style={styles.loginContainer}>
-            <Pressable 
-              onPress={() => navigation.navigate('Login')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-              })}
-            >
-              <Text style={styles.loginText}>Login</Text>
-            </Pressable>
-            <Pressable 
-              onPress={() => navigation.navigate('CadastroPessoal')}
-              style={({ pressed }) => ({
-                opacity: pressed ? 0.5 : 1,
-                padding: 10,
-              })}
-            >
-              <Text style={styles.loginText}>Cadastre-se</Text>
-            </Pressable>
-          </View>
-
-          <View style={styles.footer}>
-            <Image 
-              source={require('../../assets/images/Meau_marca_2.png')} 
-              style={styles.logoImage} 
-            />
-          </View>
+          <SEButton onPress={() => navigation.navigate('App', { screen: 'Adotar', params: { screen: 'CadastroAnimal' } })}>
+            Cadastrar Animal
+          </SEButton>
         </View>
-      </ScrollView>
+      </View>
+
+      {/* Botão login - separado e clicável */}
+      <View style={styles.loginContainer}>
+        <Pressable 
+          onPress={() => navigation.navigate('CadastroPessoal')}
+          style={({ pressed }) => ({
+            opacity: pressed ? 0.5 : 1,
+            padding: 10,
+          })}
+        >
+          <Text style={styles.loginText}>login</Text>
+        </Pressable>
+      </View>
+
+      {/* Footer */}
+      <View style={styles.footer}>
+        <Image 
+          source={require('../../assets/images/Meau_marca_2.png')} 
+          style={styles.logoImage} 
+        />
+      </View>
     </SafeAreaView>
   );
 }
@@ -68,24 +57,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fafafa',
   },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'space-between',
-    paddingVertical: 20,
-  },
   mainContent: {
-    flex: 1,
+    flex: 0.7, // Reduzido para dar espaço ao botão
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: 40, 
   },
   loginContainer: {
     alignItems: 'center',
+    marginTop: 10,
     marginBottom: 10,
   },
   footer: {
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: 'auto',
     paddingBottom: 20,
   },
   title: {
@@ -93,7 +77,6 @@ const styles = StyleSheet.create({
     fontSize: 72,
     color: '#ffd358',
     textAlign: 'center',
-    marginTop: 10,
   },
   subtitle: {
     fontFamily: 'Roboto-Regular',
@@ -119,6 +102,5 @@ const styles = StyleSheet.create({
   buttonContainer: {
     width: 232,
     gap: 16,
-    marginBottom: 20,
   }
 });
