@@ -26,6 +26,7 @@ import { Privacidade } from './screens/Privacidade';
 import { Termo } from './screens/Termo';
 import { Chat } from './screens/Chat';
 import { Dicas } from './screens/Dicas';
+import { InformacoesPets } from './screens/InformacoesPets';
 
 const Stack = createNativeStackNavigator();
 const Drawer = createDrawerNavigator();
@@ -193,6 +194,15 @@ export function AppDrawer() {
           headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '#434343' },
         }}
       />
+      <Drawer.Screen
+        name="InformacoesPets"
+        component={InformacoesPets}
+        options={{
+          title: 'Informações do Pet',
+          headerStyle: { backgroundColor: '#88c9bf' },
+          headerTitleStyle: { fontFamily: 'Roboto-Medium', fontSize: 20, color: '#434343' },
+        }}
+      />
     </Drawer.Navigator>
   );
 }
@@ -232,6 +242,7 @@ const RootStack = createNativeStackNavigator({
           Termo: 'termo',
           Historias: 'historias',
           Privacidade: 'privacidade',
+          InformacoesPets: 'informacoes-pets',
         }
       },
     },
@@ -303,6 +314,7 @@ const linking = {
           },
           MeuPerfil: 'meu-perfil',
           MeusPets: 'meus-pets', 
+          InformacoesPets: 'informacoes-pets',
           Favoritos: 'favoritos',
           Chat: 'chat', 
           Dicas: 'dicas',
@@ -332,6 +344,7 @@ type HomeStackParamList = {
 type DrawerParamList = {
   MeuPerfil: undefined;
   MeusPets: undefined;
+  InformacoesPets: { petId: string };
   Favoritos: undefined;
   Chat: undefined;
   Adotar: NavigatorScreenParams<HomeStackParamList>;
