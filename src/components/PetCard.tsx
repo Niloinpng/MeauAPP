@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { View, StyleSheet, Image } from 'react-native';
 import { Card, Text, IconButton } from 'react-native-paper';
+import { Animal } from '../types';
 
 const CARD = {
   width: 344,
@@ -10,44 +11,39 @@ const CARD = {
 } as const;
 const FOOTER_H = CARD.height - CARD.headerH - CARD.imageH;
 
-type Pet = {
-  id: string;
-  name: string;
-  image: string;
-  gender: string;
-  age: string;
-  size: string;
-  location: string;
-};
-
 interface PetCardProps {
-  pet: Pet;
+  pet: Animal;
 }
 
 export const PetCard: React.FC<PetCardProps> = ({ pet }) => {
+  const placeholderImage = 'https://placehold.co/344x183/e0e0e0/757575?text=Sem+Foto';
+
   return (
     <Card style={styles.card} mode="elevated">
       <View style={styles.cardHeader}>
-        <Text style={styles.cardTitle}>{pet.name}</Text>
+        <Text style={styles.cardTitle}>{pet.nome}</Text>
         <IconButton
           icon="heart-outline"
           size={24}
           iconColor="#434343"
           onPress={() => {
-            console.log(`Favoritou ${pet.name}`);
+            console.log(`Favoritou ${pet.nome}`);
           }}
         />
       </View>
 
-      <Image source={{ uri: pet.image }} style={styles.image} />
+      <Image 
+        source={{ uri: pet.fotoPrincipal || placeholderImage }} 
+        style={styles.image} 
+      />
 
       <View style={styles.footer}>
         <View style={styles.tagsRow}>
-          <Text style={styles.tag}>{pet.gender}</Text>
-          <Text style={styles.tag}>{pet.age}</Text>
-          <Text style={styles.tag}>{pet.size}</Text>
+          <Text style={styles.tag}>{pet.sexo}</Text>
+          <Text style={styles.tag}>{pet.idade}</Text>
+          <Text style={styles.tag}>{pet.porte}</Text>
         </View>
-        <Text style={styles.location}>{pet.location}</Text>
+        <Text style={styles.location}>{pet.localizacao}</Text>
       </View>
     </Card>
   );
@@ -78,6 +74,7 @@ const styles = StyleSheet.create({
   image: {
     width: CARD.width,
     height: CARD.imageH,
+    backgroundColor: '#f0f0f0',
   },
   footer: {
     height: FOOTER_H,
@@ -96,11 +93,14 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#434343',
     fontFamily: 'Roboto-Regular',
+    textTransform: 'capitalize', 
   },
   location: {
     fontSize: 12,
     color: '#434343',
     fontFamily: 'Roboto-Regular',
     textAlign: 'center',
+    textTransform: 'capitalize',
+    paddingHorizontal: 8,
   },
 });
